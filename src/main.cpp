@@ -1,4 +1,4 @@
-//Project: SearcherAStarOnESP32
+//Project: ESP32_SearcherAStar
 //main.cpp  
 //
 
