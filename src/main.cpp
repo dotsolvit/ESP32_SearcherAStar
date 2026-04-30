@@ -19,7 +19,6 @@ volatile Par obstacleSetPar = {0, 0, MAX_OBSTACLE_LENGH};
 
 //Real Coordinates
 volatile realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
-volatile int currentAngle; //Текущий угол по Х
 
 //Стврюємо мютекс для синхронізації доступу до спільних масивів (Create a mutex for synchronizing access to shared matrixes) 
 SemaphoreHandle_t xMutex;
@@ -30,6 +29,8 @@ QueueHandle_t toWebQueue, toDriveQueue;   // створюємо дві черг�
 TaskHandle_t driveTaskHandle = NULL;
 TaskHandle_t webTaskHandle = NULL;
 
+volatile int currentAngle, displayed_currentAngle ; //Текущий угол по Х
+
 //FreeRTOS tasks Drive:
 void driveTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
   (void) pvParameters;                  // ігноруємо вхідні параметри
@@ -38,6 +39,8 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   initRealCoords(); //Init Real Coordinates
   initializationObstacleSet();  //Init Obstacle Set
   initStage(); //Init Stage
+  
+  initMPU6050(); //Init MPU6050
   
   bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  
   while (true) {  // безкінечний цикл задачі

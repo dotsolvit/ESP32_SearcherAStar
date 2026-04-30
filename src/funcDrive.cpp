@@ -4,6 +4,7 @@
 #include "config.hpp"
 #include "funcDrive.hpp"
 #include "funcArray.hpp"
+#include "funcMPU6050.hpp"
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
@@ -14,11 +15,13 @@ extern Par obstacleSetPar;
 
 //Real Coordinates (in main.cpp):
 extern realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
-extern int currentAngle; //Текущий угол по Х
+
 //Mutex for synchronizing access to shared matrixes (in main.cpp):
 extern SemaphoreHandle_t xMutex;
 
 extern QueueHandle_t toWebQueue, toDriveQueue;   // two FreeRTOS queues: toWeb and toDrive (in main.cpp)
+
+extern int currentAngle, displayed_currentAngle; //Текущий угол по Х (in main.cpp)
 
 //STAGES:
 #define STAGE_WAITE 0
@@ -40,7 +43,11 @@ void initRealCoords() {
     } 
     else {
       Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
-    }   
+    }
+    
+    //Get rotation angle in degrees:
+    currentAngle = getAngleX();
+    displayed_currentAngle = currentAngle ;
 }
 
 //Init Obstacle Set:
@@ -85,6 +92,11 @@ void initStage() {
     displayed_stage = 255; // Невідображений етап (Undisplayed stage)
 }
 
+//Init MPU6050:
+void initMPU6050() {
+    initializationMPU6050(); // Ініціалізація MPU6050 (MPU6050 initialization)
+}
+
 // виконуємо основну логіку керування (execute main drive logic)
 void cycleDrive(void){
     //display the stage:
@@ -104,6 +116,15 @@ void cycleDrive(void){
     
     //Stage 0 - Waiting control stage
     if(stage == STAGE_WAITE){ 
+        //Show angl: 
+        currentAngle=getAngleX();
+        if(displayed_currentAngle != currentAngle){
+            displayed_currentAngle = currentAngle ;
+            //displayTFT(1, "Angle= ", currentAngle, " ");
+            Serial.println("Angle= " + String(currentAngle)); // Виводимо поточний кут для перевірки (Print current angle for verification)
+        }
+        //
+
         if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //Як що є данні від Web (If there are data from Web)
             xQueueReceive(toDriveQueue, &receivedByte, 0);
             // Обробляємо отриманий байт (Process received byte)
