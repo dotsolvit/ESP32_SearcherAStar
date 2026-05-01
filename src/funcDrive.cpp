@@ -5,6 +5,8 @@
 #include "funcDrive.hpp"
 #include "funcArray.hpp"
 #include "funcMPU6050.hpp"
+#include "funcFindPath.hpp"
+#include "funcTransfCoordsAngles.hpp"
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
@@ -27,6 +29,7 @@ extern int currentAngle, displayed_currentAngle; //Текущий угол по 
 #define STAGE_WAITE 0
 #define STAGE_FINDPATH 1
 #define STAGE_GO 2
+#define STAGE_RUN 3 //STAGE_FINDPATH + STAGE_GO
 
 //Stage
 byte stage, displayed_stage;
@@ -46,7 +49,7 @@ void initRealCoords() {
     }
     
     //Get rotation angle in degrees:
-    currentAngle = getAngleX();
+    //currentAngle = getAngleX();
     displayed_currentAngle = currentAngle ;
 }
 
@@ -71,6 +74,8 @@ int initializationObstacleSet(){
         obstacle={2,8};   
         AddCoords(obstacleSet, obstacleSetPar, obstacle);
         obstacle={2,9};
+        AddCoords(obstacleSet, obstacleSetPar, obstacle);
+        obstacle={20,16};
         AddCoords(obstacleSet, obstacleSetPar, obstacle);
 
         Serial.println(obstacleSet[0].y); // Виводимо координату y першої перешкоди для перевірки (Print y coordinate of the first obstacle for verification)
@@ -108,6 +113,8 @@ void cycleDrive(void){
             Serial.println("FINDPATH");
         } else if(stage == STAGE_GO) {
             Serial.println("GO");
+        } else if(stage == STAGE_RUN) {
+            Serial.println("RUN");
         } else {
             Serial.println("UNKNOWN");
         }
@@ -117,7 +124,7 @@ void cycleDrive(void){
     //Stage 0 - Waiting control stage
     if(stage == STAGE_WAITE){ 
         //Show angl: 
-        currentAngle=getAngleX();
+        //currentAngle=getAngleX();
         if(displayed_currentAngle != currentAngle){
             displayed_currentAngle = currentAngle ;
             //displayTFT(1, "Angle= ", currentAngle, " ");
@@ -145,10 +152,31 @@ void cycleDrive(void){
     }
 
     //Stage STAGE_FINDPATH *******************************************
-    if(stage == STAGE_FINDPATH){
-        //.........
-        vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс (poll every 100ms)
-        stage = STAGE_WAITE;
+    if(stage == STAGE_FINDPATH  or stage == STAGE_RUN){
+        Serial.println("Start find path:");
+        //Cleat path set 
+        ClearCoords(pathSet, pathSetPar);
+        Coord start_coord = TransformRealToGridCoords(realCoordsCurrent);
+        Coord goal_coord = TransformRealToGridCoords(realCoordsGoal);
+        ReturnCode code = findPath (start_coord , goal_coord );
+        if( code.return_code != 0) {
+            Serial.print(code.return_code);
+            Serial.println("Pathfinding is unsuccessful!");
+        }
+        else{
+            Serial.println("The path has been found");
+
+            //Compress Path:
+            Serial.println("Compress Path");
+            compressPath();
+            Serial.println("The path has been compressed");
+        }
+
+        if(stage == STAGE_RUN) {
+            stage = STAGE_GO;
+            //time_finish=0; //Нулевое время финиша - это начало отработки пути
+        }
+        else stage = STAGE_WAITE; //Stage Waiting control stage
     }
 
     //Stage STAGE_GO *******************************************

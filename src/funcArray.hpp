@@ -14,3 +14,13 @@ int indexFindPointCoords( Coord *set, Par &setp, Coord &c);
 
 //Видалити точку за індексом в одновимірній матриці координат (Remove a point by index in a one-dimensional coordinate matrix)
 int RemoveCoords(Coord *set, Par &setp, int index);
+
+//Операції зі списком вузлів (Operations with the list of nodes)
+//Додати вузол(Add a node)  
+int AddNode( Node *set, Par &setp, Node &n);
+//Видалити вузол(Remove a node)
+int RemoveNode( Node *set, Par &setp, Node &n); 
+//Знайти вузол з координатами(Find a node with coordinates) 
+int indexFindNode( Node *set, Par &setp, Coord &c);
+//Очистити список вузлів(Clear a list of nodes)
+void ClearNodes(Node *set, Par &setp);  

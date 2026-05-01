@@ -40,7 +40,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   initializationObstacleSet();  //Init Obstacle Set
   initStage(); //Init Stage
   
-  initMPU6050(); //Init MPU6050
+  //initMPU6050(); //Init MPU6050
   
   bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  
   while (true) {  // безкінечний цикл задачі
