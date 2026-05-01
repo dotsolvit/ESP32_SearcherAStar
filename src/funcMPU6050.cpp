@@ -8,6 +8,9 @@
 
 #include "funcMPU6050.hpp" //Functions MPU6050
 
+//Наявність модуля MPU6050
+bool isMPU6050Present;
+
 //For MPU6050 DMP6:
 MPU6050 mpu;
 /*---MPU6050 Control/Status Variables---*/
@@ -21,6 +24,13 @@ float euler[3];         // [psi, theta, phi]    Euler angle container
 //MPU6050 DMP6 initialization
 void initializationMPU6050(){
   Wire.begin();
+  isMPU6050Present=mpu.testConnection();
+  if(isMPU6050Present) {
+    Serial.println("MPU6050 is connected");
+  } else {
+    Serial.println("MPU6050 connection failed");
+    return;
+  } 
   Serial.print("MPU6050 Initialization"); 
   mpu.initialize();
   devStatus = mpu.dmpInitialize();
@@ -52,6 +62,7 @@ int normalize(int angle) {
 
 //Get rotation angle in degrees:
 int getAngleX(void){
+  if(!isMPU6050Present) return 0; 
   //rotation angle:
   float angle; //angle in radians
   int angleInDegrees;

@@ -124,7 +124,7 @@ void cycleDrive(void){
     //Stage 0 - Waiting control stage
     if(stage == STAGE_WAITE){ 
         //Show angl: 
-        //currentAngle=getAngleX();
+        currentAngle=getAngleX();
         if(displayed_currentAngle != currentAngle){
             displayed_currentAngle = currentAngle ;
             //displayTFT(1, "Angle= ", currentAngle, " ");
