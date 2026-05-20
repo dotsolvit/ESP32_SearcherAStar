@@ -145,7 +145,9 @@ void cycleDrive(void){
         currentAngle=getAngleX();
         displayAngle( currentAngle );
         // 
-        displayBattery(); //Display battery
+        displayBattery();  //Display battery
+        displayDistance(); //Display distance to obstacles
+        
         // WRM show distance to obstacles
         int distance = IR_Distance();
         displayMessage(2, "Dist= ", distance, "cm");

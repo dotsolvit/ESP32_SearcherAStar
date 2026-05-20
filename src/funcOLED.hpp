@@ -3,8 +3,8 @@
 //Display initialization 
 void initDisplay(void);
 
-//Display WiFi sign
-void displayWiFiSign(void);
+//Display distance to obstacles
+void displayDistance(void);
 
 //Display angle
 void displayAngle(int angle);

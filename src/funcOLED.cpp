@@ -13,6 +13,7 @@
 
 #include "config.hpp"
 #include "funcOLED.hpp"
+#include "funcIRSensors.hpp"
 
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
@@ -36,12 +37,19 @@ void initDisplay(void){
   display.display(); 
 }
 
-//Display WiFi sign
-void displayWiFiSign(void){
-  display.fillRect(0, 0, 19, 15, BLACK);
-  display.setCursor(0, 0);
-  display.println(" W ");
-  display.display();
+//Display distance to obstacles
+void displayDistance(void){
+  static int prev_distance = -1; // Змінна для збереження останнього відображенного расстояния (Variable to store the last displayed distance)
+  int distance = IR_Distance();
+  if (distance != prev_distance) {
+    prev_distance = distance; // Update the last displayed distance
+    display.fillRect(35, 0, 51, 15, BLACK);
+    display.setCursor(35, 0);
+    display.print("D=");
+    display.print(distance);
+    display.println(" cm");
+    display.display();
+  }
 }
 
 //Display angle
@@ -50,9 +58,9 @@ void displayAngle(int angle){
     //Display only if angle has changed (to reduce flickering and unnecessary updates)
     if (angle != prev_angle) {
         prev_angle = angle; // Update the last displayed angle
-        display.fillRect(20, 0, 60, 15, BLACK);
-        display.setCursor(16, 0);
-        display.print("Angl= ");
+        display.fillRect(0, 0, 35, 15, BLACK);
+        display.setCursor(0, 0);
+        display.print("A=");
         display.println(angle);
         display.display();
     }
@@ -71,11 +79,11 @@ void displayBattery(void){
     if (percentage != prev_percentage) {
         prev_percentage = percentage; // Update the last displayed percentage
         // 4. Display on OLED   
-        display.fillRect(80, 0, 48, 15, BLACK);
-        display.setCursor(80, 0);
-        display.print("B= ");
+        display.fillRect(86, 0, 42, 15, BLACK);
+        display.setCursor(86, 0);
+        display.print("B=");
         display.print(percentage);
-        display.println(" %");
+        display.println("%");
         display.display();
     }
 }

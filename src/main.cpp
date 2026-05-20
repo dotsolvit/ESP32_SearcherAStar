@@ -64,8 +64,8 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   vTaskDelay(10000 / portTICK_PERIOD_MS);       // пауза 10 seconds (delay 10 seconds, lets other tasks run)
   displayMessage(1, "OK", 0, "");
 
-  //Display WiFi sign
-  displayWiFiSign();
+  //Display distance to obstacles
+  displayDistance();
   //Display angle
   displayAngle( getAngleX() );
   //Display battery
