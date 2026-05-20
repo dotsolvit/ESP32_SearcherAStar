@@ -47,9 +47,10 @@ void initializationMPU6050(){
     mpu.CalibrateGyro(6);
     mpu.setDMPEnabled(true);
     DMPReady = true;
+    Serial.println(F("DMP Initialization succeeded"));
   } 
   else {
-    Serial.print(F("DMP Initialization failed")); //Print the error code
+    Serial.println(F("DMP Initialization failed")); //Print the error code
   }
 }
 
@@ -62,7 +63,7 @@ int normalize(int angle) {
 
 //Get rotation angle in degrees:
 int getAngleX(void){
-  if(!isMPU6050Present) return 0; 
+  //if(!isMPU6050Present) return 0; 
   //rotation angle:
   float angle; //angle in radians
   int angleInDegrees;

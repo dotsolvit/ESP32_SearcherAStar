@@ -122,10 +122,6 @@ void cycleDrive(void){
         if(stage == STAGE_WAITE) {
             displayMessage(1, "Stage: WAITE", 0, "");
             Serial.println("WAITE");
-            //WRM
-            Serial.print("Angl=");
-            Serial.println(getAngleX());
-            //
         } else if(stage == STAGE_FINDPATH) {
             displayMessage(1, "Stage: FINDPATH", 0, "");
             Serial.println("FINDPATH");
@@ -152,6 +148,9 @@ void cycleDrive(void){
 
         if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //Як що є данні від Web (If there are data from Web)
             xQueueReceive(toDriveQueue, &receivedByte, 0);
+            String receivedByteStr = String((char)receivedByte); // Convert byte to String for display 
+            Serial.println("Received byte from Web: " + receivedByteStr); // Виводимо отриманий байт для перевірки (Print received byte for verification)   
+            displayMessage(3, receivedByteStr.c_str(), 0, "");
             // Обробляємо отриманий байт (Process received byte)
             if(receivedByte == ' ') { //If get ' ' command
                 return;
