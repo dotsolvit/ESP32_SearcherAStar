@@ -8,6 +8,7 @@
 #include "funcFindPath.hpp"
 #include "funcTransfCoordsAngles.hpp"
 #include "funcOLED.hpp"
+#include "funcIRSensors.hpp"
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
@@ -145,6 +146,12 @@ void cycleDrive(void){
         displayAngle( currentAngle );
         // 
         displayBattery(); //Display battery
+        // WRM show distance to obstacles
+        int distance = IR_Distance();
+        displayMessage(2, "Dist= ", distance, "cm");
+        // WRM show distance covered
+        int distanceCovered = odometer();
+        displayMessage(3, "Dist Covered= ", distanceCovered, "cm");
 
         if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //Як що є данні від Web (If there are data from Web)
             xQueueReceive(toDriveQueue, &receivedByte, 0);

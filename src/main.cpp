@@ -34,6 +34,18 @@ TaskHandle_t webTaskHandle = NULL;
 
 volatile int currentAngle, displayed_currentAngle ; //Текущий угол по Х
 
+//Distance covered counters:
+volatile int distancePulseCounterLeft = 0;
+volatile int distancePulseCounterRight = 0;
+
+// Функция-обработчик прерывания (ISR)
+void IRAM_ATTR handlePulseLeft() {
+  distancePulseCounterLeft++;
+}
+void IRAM_ATTR handlePulseRight() {
+  distancePulseCounterRight++;
+}
+
 //FreeRTOS tasks Drive:
 void driveTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
   (void) pvParameters;                  // ігноруємо вхідні параметри
@@ -58,6 +70,8 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   displayAngle( getAngleX() );
   //Display battery
   displayBattery();
+
+
   
   bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  
   while (true) {  // безкінечний цикл задачі
@@ -109,6 +123,19 @@ void webTask(void *pvParameters) {    // функція задачі FreeRTOS (t
 void setup() {
   Serial.begin(115200); // ініціалізуємо Serial для відладки (init Serial monitor)
   Wire.begin();
+
+  //Set interrupt////////////
+  // 
+  pinMode(IRSENSOR_LEFT_PIN, INPUT);
+  pinMode(IRSENSOR_RIGHT_PIN, INPUT);
+  //FALLING : HIGH to LOW)
+  attachInterrupt(digitalPinToInterrupt(IRSENSOR_LEFT_PIN), handlePulseLeft, FALLING);
+  attachInterrupt(digitalPinToInterrupt(IRSENSOR_RIGHT_PIN), handlePulseRight, FALLING);
+  //Ddistance covered counters:
+  distancePulseCounterLeft = 0;
+  distancePulseCounterRight = 0;
+  Serial.println("Interrupts are initialized");
+  ////////////////////////////
 
   // створюємо мютекс (create mutex)
   xMutex = xSemaphoreCreateMutex(); 

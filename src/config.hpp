@@ -31,6 +31,23 @@
 #define SCREEN_ADDRESS 0x3C
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 
+//interrupt:
+//GPIO 32 – optical sensor L
+//GPIO 33 – optical sensor R
+#define IRSENSOR_LEFT_PIN 32
+#define IRSENSOR_RIGHT_PIN 33
+
+//distance per impulse cm
+#define DISTANCE_PER_IMPULSE 1.028  // cm/pulse
+
+//Coefficients of the approximating equation distance = A * x ^ B
+//5,0V :
+//#define COEFFICIENT_A 22261
+//#define COEFFICIENT_B -0.8476
+//4,8V :
+#define COEFFICIENT_A 24292
+#define COEFFICIENT_B -0.8586
+
 //Структура координат сітки
 struct Coord {
   uint8_t y, x;     // Координаты (0-255)
