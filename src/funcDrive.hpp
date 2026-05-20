@@ -9,6 +9,9 @@ int initializationObstacleSet();
 //Init Stage:
 void initStage();
 
+//Init Buzzer:
+void initBuzzer();
+
 //Init MPU6050:
 void initMPU6050();
 

@@ -3,9 +3,12 @@
 //
 
 #include <Arduino.h>
+#include <Wire.h>
 #include "config.hpp" 
 #include "funcDrive.hpp"
 #include "funcWiFiWeb.h"
+#include "funcOLED.hpp"
+#include "funcMPU6050.hpp"
 
 //Create arrays for shared use in tasks (Створюємо масиви для спільного використання у завданнях)
 //Створюємо шлях (як масив координат та його параметри) 
@@ -35,12 +38,26 @@ volatile int currentAngle, displayed_currentAngle ; //Текущий угол п
 void driveTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
   (void) pvParameters;                  // ігноруємо вхідні параметри
 
+   
+  initDisplay(); //Display initialization
+  //Init Buzzer:
+  initBuzzer();
 
   initRealCoords(); //Init Real Coordinates
   initializationObstacleSet();  //Init Obstacle Set
   initStage(); //Init Stage
   
+  displayMessage(1, "Waiting 10 seconds..", 0, "");
   initMPU6050(); //Init MPU6050
+  vTaskDelay(10000 / portTICK_PERIOD_MS);       // пауза 10 seconds (delay 10 seconds, lets other tasks run)
+  displayMessage(1, "OK", 0, "");
+
+  //Display WiFi sign
+  displayWiFiSign();
+  //Display angle
+  displayAngle( getAngleX() );
+  //Display battery
+  displayBattery();
   
   bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  
   while (true) {  // безкінечний цикл задачі
@@ -61,6 +78,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
     } 
   }
 }
+
 //FreeRTOS tasks Web:
 void webTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
   (void) pvParameters;                  // ігноруємо вхідні параметри
@@ -90,6 +108,7 @@ void webTask(void *pvParameters) {    // функція задачі FreeRTOS (t
 
 void setup() {
   Serial.begin(115200); // ініціалізуємо Serial для відладки (init Serial monitor)
+  Wire.begin();
 
   // створюємо мютекс (create mutex)
   xMutex = xSemaphoreCreateMutex(); 

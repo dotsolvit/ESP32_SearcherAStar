@@ -23,15 +23,15 @@ float euler[3];         // [psi, theta, phi]    Euler angle container
 
 //MPU6050 DMP6 initialization
 void initializationMPU6050(){
-  Wire.begin();
+  //Wire.begin(); //in main.cpp 
   isMPU6050Present=mpu.testConnection();
   if(isMPU6050Present) {
     Serial.println("MPU6050 is connected");
   } else {
     Serial.println("MPU6050 connection failed");
-    return;
+    //return;
   } 
-  Serial.print("MPU6050 Initialization"); 
+  Serial.println("MPU6050 Initialization"); 
   mpu.initialize();
   devStatus = mpu.dmpInitialize();
   /* Supply your gyro offsets here, scaled for min sensitivity */

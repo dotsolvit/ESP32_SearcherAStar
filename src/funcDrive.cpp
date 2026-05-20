@@ -7,6 +7,7 @@
 #include "funcMPU6050.hpp"
 #include "funcFindPath.hpp"
 #include "funcTransfCoordsAngles.hpp"
+#include "funcOLED.hpp"
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
@@ -97,6 +98,17 @@ void initStage() {
     displayed_stage = 255; // Невідображений етап (Undisplayed stage)
 }
 
+//Init Buzzer:
+void initBuzzer() {
+    tone(BUZ_PIN, 500);
+    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
+    noTone(BUZ_PIN);
+    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
+    tone(BUZ_PIN, 1000);
+    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)  
+    noTone(BUZ_PIN);
+}
+
 //Init MPU6050:
 void initMPU6050() {
     initializationMPU6050(); // Ініціалізація MPU6050 (MPU6050 initialization)
@@ -108,14 +120,23 @@ void cycleDrive(void){
     if(displayed_stage != stage) { // Якщо етап змінився (If stage has changed)
         Serial.print("Stage: ");
         if(stage == STAGE_WAITE) {
+            displayMessage(1, "Stage: WAITE", 0, "");
             Serial.println("WAITE");
+            //WRM
+            Serial.print("Angl=");
+            Serial.println(getAngleX());
+            //
         } else if(stage == STAGE_FINDPATH) {
+            displayMessage(1, "Stage: FINDPATH", 0, "");
             Serial.println("FINDPATH");
         } else if(stage == STAGE_GO) {
+            displayMessage(1, "Stage: GO", 0, "");
             Serial.println("GO");
         } else if(stage == STAGE_RUN) {
+            displayMessage(1, "Stage: RUN", 0, "");
             Serial.println("RUN");
         } else {
+            displayMessage(1, "Stage: UNKNOWN", 0, "");
             Serial.println("UNKNOWN");
         }
         displayed_stage = stage; // Оновлюємо відображений етап (Update displayed stage)
@@ -125,12 +146,9 @@ void cycleDrive(void){
     if(stage == STAGE_WAITE){ 
         //Show angl: 
         currentAngle=getAngleX();
-        if(displayed_currentAngle != currentAngle){
-            displayed_currentAngle = currentAngle ;
-            //displayTFT(1, "Angle= ", currentAngle, " ");
-            Serial.println("Angle= " + String(currentAngle)); // Виводимо поточний кут для перевірки (Print current angle for verification)
-        }
-        //
+        displayAngle( currentAngle );
+        // 
+        displayBattery(); //Display battery
 
         if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //Як що є данні від Web (If there are data from Web)
             xQueueReceive(toDriveQueue, &receivedByte, 0);
