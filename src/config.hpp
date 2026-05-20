@@ -48,6 +48,29 @@
 #define COEFFICIENT_A 24292
 #define COEFFICIENT_B -0.8586
 
+// PWM settings for motors
+#define MOTORS_PWM_FREQ 5000
+#define MOTORS_PWM_RESOLUTION 8
+
+// Define motor driver pins
+#define MOTOR_L_A_Pin 16 //in1
+#define MOTOR_L_B_Pin 17 //in2
+#define MOTOR_R_A_Pin 19 //in3
+#define MOTOR_R_B_Pin 18 //in4
+#define MOTOR_L_A_Channel 0
+#define MOTOR_L_B_Channel 1 
+#define MOTOR_R_A_Channel 2
+#define MOTOR_R_B_Channel 3 
+//speed adjustment between motors:
+#define SPEED_ADJUSTMENT 15  //17
+
+//SERVO
+//servo with min/max pulse widths:
+#define SERVO_MIN_PULSE 350
+#define SERVO_MAX_PULSE 2400
+#define SERVO_MAX_ANGLE 86 //Maximum rotation angle from the center position - 0 +
+#define PIN_SERVO 23 //GPIO 23 servo
+
 //Структура координат сітки
 struct Coord {
   uint8_t y, x;     // Координаты (0-255)

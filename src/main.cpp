@@ -9,6 +9,7 @@
 #include "funcWiFiWeb.h"
 #include "funcOLED.hpp"
 #include "funcMPU6050.hpp"
+#include "funcMotors.hpp"
 
 //Create arrays for shared use in tasks (Створюємо масиви для спільного використання у завданнях)
 //Створюємо шлях (як масив координат та його параметри) 
@@ -71,6 +72,13 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   //Display battery
   displayBattery();
 
+  //Servo intialization
+  initServo();
+  setServo(0);
+
+  //Motor initialization
+  initializationMotors();
+  Serial.println("Motors are initialized");
 
   
   bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  

@@ -9,6 +9,7 @@
 #include "funcTransfCoordsAngles.hpp"
 #include "funcOLED.hpp"
 #include "funcIRSensors.hpp"
+#include "funcMotors.hpp" 
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
