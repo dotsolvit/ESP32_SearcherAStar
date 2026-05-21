@@ -94,6 +94,7 @@ void Web_starting(){
   server.on("/sendyx", handle_sendyx);  //Actions when pressing send y x
   server.on("/findpath", handle_findpath);  //Actions when pressing find path
   server.on("/sendgo", handle_sendgo); //Actions when pressing send go
+  server.on("/sendrun", handle_sendrun); //Actions when pressing send run
   server.on("/seemap", handle_seemap); //Actions when pressing see map
   server.on("/seemapup", handle_seemapup);  //Actions when pressing See Map Up 10
   server.on("/seemapdown", handle_seemapdown);  //Actions when pressing See Map Down 10
@@ -155,10 +156,18 @@ void handle_findpath(void) {
   server.send(303);
 }
 //Actions when pressing send go
-void handle_sendgo() {
+void handle_sendgo(void) {
   Serial.println("G"); //Send Go command to Serial
   byte sendedByteW = 'G'; //Set Go command to sendedByte
   xQueueSend(toDriveQueue, &sendedByteW, 0); //Send Go command to toDriveQueue
+  server.sendHeader("Location", "/"); //Redirect to the main page
+  server.send(303);
+}
+//Actions when pressing send run
+void handle_sendrun(void) {
+  Serial.println("R"); //Send Run command to Serial
+  byte sendedByteW = 'R'; //Set Run command to sendedByte
+  xQueueSend(toDriveQueue, &sendedByteW, 0); //Send Run command to toDriveQueue
   server.sendHeader("Location", "/"); //Redirect to the main page
   server.send(303);
 }
@@ -226,6 +235,8 @@ String SendHTML(void) {
           <button onclick="location.href='/findpath'">Find Path</button>
           <br>
           <button onclick="location.href='/sendgo'">Send Go</button>
+          
+          <button onclick="location.href='/sendrun'">Send Run</button>
           <br>
           <button onclick="location.href='/seemap'">See Map</button>
         </div>

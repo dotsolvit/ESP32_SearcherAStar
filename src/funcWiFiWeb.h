@@ -15,7 +15,10 @@ void handle_Client(void);
 void handle_OnConnect(void);
 
 //Actions when pressing send go
-void handle_sendgo(void);   
+void handle_sendgo(void);  
+
+//Actions when pressing send run
+void handle_sendrun(void);
 
 //Actions when pressing send y x
 void handle_sendyx(void);

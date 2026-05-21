@@ -173,12 +173,16 @@ void cycleDrive(void){
                 stage = STAGE_FINDPATH;
                 return; 
             }
+            else if(receivedByte == 'R') { //If get "Run" command
+                stage = STAGE_RUN;
+                return; 
+            }
         }
 
     }
 
     //Stage STAGE_FINDPATH *******************************************
-    if(stage == STAGE_FINDPATH  or stage == STAGE_RUN){
+    if(stage == STAGE_FINDPATH ){
         Serial.println("Start find path:");
         //Cleat path set 
         ClearCoords(pathSet, pathSetPar);
@@ -199,8 +203,8 @@ void cycleDrive(void){
         }
 
         if(stage == STAGE_RUN) {
-            stage = STAGE_GO;
-            finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
+            //stage = STAGE_GO;
+            //finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
         }
         else stage = STAGE_WAITE; //Stage Waiting control stage
     }
@@ -242,4 +246,14 @@ void cycleDrive(void){
             Serial.println("Tank is moving forward");
         }
     }
+    //WRM Stage STAGE_RUN *******************************************
+    if(stage == STAGE_RUN) {
+        for(int i=-SERVO_MAX_ANGLE; i<= SERVO_MAX_ANGLE; i+=45){ //Test servo
+            setServo(i);
+            delay(800);     
+        }
+        stage = STAGE_WAITE;
+        return;
+    }
+
 }

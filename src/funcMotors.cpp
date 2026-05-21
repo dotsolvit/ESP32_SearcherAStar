@@ -1,13 +1,14 @@
 //Functions for motors and servo
 // Add Lib: ESP32Servo by Kevin Harrington 3.2.0
 
+#include <Arduino.h>
 #include <Wire.h>
-#include <ESP32Servo.h>
+//#include <ESP32Servo.h>
 
 #include "config.hpp"
 #include "funcMotors.hpp"
 
-Servo servoMotor;  // Створюємо об'єкт сервопривода
+//Servo servoMotor;  // Створюємо об'єкт сервопривода
 
 //Motor initialization
 void initializationMotors(void){
@@ -65,16 +66,28 @@ void TankStop(void){
 //SERVO
 //Servo intialization
 void initServo(void){
-  servoMotor.setPeriodHertz(50); // // Standard 50hz servo
-  servoMotor.attach(PIN_SERVO, SERVO_MIN_PULSE, SERVO_MAX_PULSE);  // Attach the servo with min/max pulse widths
+  // Setting up the PWM channel (Channel, Frequency, Resolution)
+  ledcSetup(SERVO_Channel, SERVO_PWM_FREQ, SERVO_PWM_RESOLUTION);
+  // Attaching the channel to the ESP32 pin
+  ledcAttachPin(PIN_SERVO, SERVO_Channel);
+
+
+  //servoMotor.setPeriodHertz(50); // // Standard 50hz servo
+  //servoMotor.attach(PIN_SERVO, SERVO_MIN_PULSE, SERVO_MAX_PULSE);  // Attach the servo with min/max pulse widths
   setServo(0); //set to 0 (servo 90 degrees)   
 }
 
 //Set Servo from - 86 (0) +86 degrees
 void setServo(int angl){
   angl=constrain(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE);
-  int pos = map(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE, 178, 0); //set servo pos
-  servoMotor.write(pos);
+  float min=0.065536 * SERVO_PWM_FREQ * SERVO_MIN_PULSE;
+  float max=0.065536 * SERVO_PWM_FREQ * SERVO_MAX_PULSE;
+  //WRM
+  Serial.println("Setting servo to angle: " + String(angl) + " degrees");
+  Serial.println("Calculated min pulse: " + String(min) + ", max pulse: " + String(max)); 
+  int pos = map(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE, int(max), int(min)); //set servo pos
+  Serial.println("Calculated servo position (duty cycle): " + String(pos));
+  ledcWrite(SERVO_Channel, pos);
 }
 
 //Tank Signal
