@@ -50,7 +50,10 @@ void IRAM_ATTR handlePulseRight() {
 //FreeRTOS tasks Drive:
 void driveTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
   (void) pvParameters;                  // ігноруємо вхідні параметри
-
+  
+  //Servo intialization
+  initServo();
+  setServo(0);
    
   initDisplay(); //Display initialization
   //Init Buzzer:
@@ -72,9 +75,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   //Display battery
   displayBattery();
 
-  //Servo intialization
-  initServo();
-  setServo(0);
+
 
   //Motor initialization
   initializationMotors();

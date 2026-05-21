@@ -28,6 +28,10 @@ extern QueueHandle_t toWebQueue, toDriveQueue;   // two FreeRTOS queues: toWeb a
 
 extern int currentAngle, displayed_currentAngle; //Текущий угол по Х (in main.cpp)
 
+//Distance covered counters:
+extern int distancePulseCounterLeft;
+extern int distancePulseCounterRight;
+
 //STAGES:
 #define STAGE_WAITE 0
 #define STAGE_FINDPATH 1
@@ -39,6 +43,9 @@ byte stage, displayed_stage;
 
 // змінні для обміну даними між задачами (variables for data exchange between tasks)
 byte sendedByte, receivedByte; 
+
+//Distance covered:
+int currentDistanceCovered, finishedDistanceCovered;
 
 //Init Real Coordinates:
 void initRealCoords() {
@@ -100,16 +107,6 @@ void initStage() {
     displayed_stage = 255; // Невідображений етап (Undisplayed stage)
 }
 
-//Init Buzzer:
-void initBuzzer() {
-    tone(BUZ_PIN, 500);
-    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
-    noTone(BUZ_PIN);
-    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
-    tone(BUZ_PIN, 1000);
-    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)  
-    noTone(BUZ_PIN);
-}
 
 //Init MPU6050:
 void initMPU6050() {
@@ -155,6 +152,7 @@ void cycleDrive(void){
         // WRM show distance covered
         int distanceCovered = odometer();
         displayMessage(3, "Dist Covered= ", distanceCovered, "cm");
+        //WRM
 
         if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //Як що є данні від Web (If there are data from Web)
             xQueueReceive(toDriveQueue, &receivedByte, 0);
@@ -167,7 +165,8 @@ void cycleDrive(void){
             }
             else if(receivedByte == 'G') { //If get "GO" command
                 stage = STAGE_GO;
-                //time_finish=0; //Нулевое время финиша - это начало отработки пути
+                //Distance covered:
+                finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
                 return;
             }
             else if(receivedByte == 'F') { //If get "Find Path" command
@@ -201,15 +200,46 @@ void cycleDrive(void){
 
         if(stage == STAGE_RUN) {
             stage = STAGE_GO;
-            //time_finish=0; //Нулевое время финиша - это начало отработки пути
+            finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
         }
         else stage = STAGE_WAITE; //Stage Waiting control stage
     }
 
     //Stage STAGE_GO *******************************************
     if(stage == STAGE_GO){
-        //.........
-         vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс (poll every 100ms)
-        stage = STAGE_WAITE;
+        //If we've even reached this stage
+        if(finishedDistanceCovered == 0){
+            //Distance covered counters:
+            distancePulseCounterLeft = 0;
+            distancePulseCounterRight = 0;  
+            
+            TankBuz(SIGNAL_GO);
+            Serial.println("Start moving to the goal");
+        }
+        currentDistanceCovered = odometer() + 1;
+        if(currentDistanceCovered < finishedDistanceCovered){ //Еще не доехали до след точки пути
+            //Сканируем наличие препятствий***************************************************
+            //,,,
+            //
+        }
+        else{
+            if(finishedDistanceCovered !=0){ //Если это было не начало пути
+                //Останавливаемся
+                TankStop();
+                vTaskDelay(250 / portTICK_PERIOD_MS); // затримка 250 мс до полної зупинки (250 ms delay to complete stop)
+                Serial.println("Tank stopped");
+                currentDistanceCovered = odometer();
+                currentAngle = getAngleX();
+                Serial.println("Current distance covered: " + String(currentDistanceCovered) + " cm"); 
+                // and other...
+                
+                stage = STAGE_WAITE;
+                return; //Завершение отработки пути (Finish path execution)
+            }
+            //WRM 
+            finishedDistanceCovered = 150; //For testing, let's say we need to cover 150 cm to reach the goal )
+            TankForward(200); //Tank Forward
+            Serial.println("Tank is moving forward");
+        }
     }
 }

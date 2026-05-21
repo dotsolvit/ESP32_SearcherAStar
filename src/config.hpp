@@ -57,10 +57,10 @@
 #define MOTOR_L_B_Pin 17 //in2
 #define MOTOR_R_A_Pin 19 //in3
 #define MOTOR_R_B_Pin 18 //in4
-#define MOTOR_L_A_Channel 0
-#define MOTOR_L_B_Channel 1 
-#define MOTOR_R_A_Channel 2
-#define MOTOR_R_B_Channel 3 
+#define MOTOR_L_A_Channel 10
+#define MOTOR_L_B_Channel 11 
+#define MOTOR_R_A_Channel 12
+#define MOTOR_R_B_Channel 13 
 //speed adjustment between motors:
 #define SPEED_ADJUSTMENT 15  //17
 
@@ -70,6 +70,11 @@
 #define SERVO_MAX_PULSE 2400
 #define SERVO_MAX_ANGLE 86 //Maximum rotation angle from the center position - 0 +
 #define PIN_SERVO 23 //GPIO 23 servo
+
+//Tank signals:
+#define SIGNAL_GO 0
+#define SIGNAL_NOPATH 1
+#define SIGNAL_OBSTACLE 2
 
 //Структура координат сітки
 struct Coord {

@@ -13,14 +13,14 @@ Servo servoMotor;  // Створюємо об'єкт сервопривода
 void initializationMotors(void){
     // Attach pins to channels
     // Old way (v2.x)
-    ledcSetup(0, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
-    ledcAttachPin(MOTOR_L_A_Pin, 0);  // (pin, channel)
-    ledcSetup(1, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
-    ledcAttachPin(MOTOR_L_B_Pin, 1);  // (pin, channel)
-    ledcSetup(2, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
-    ledcAttachPin(MOTOR_R_A_Pin, 2);  // (pin, channel)
-    ledcSetup(3, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
-    ledcAttachPin(MOTOR_R_B_Pin, 3);  // (pin, channel) 
+    ledcSetup( MOTOR_L_A_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcAttachPin(MOTOR_L_A_Pin, MOTOR_L_A_Channel);  // (pin, channel)
+    ledcSetup( MOTOR_L_B_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcAttachPin(MOTOR_L_B_Pin, MOTOR_L_B_Channel);  // (pin, channel)
+    ledcSetup( MOTOR_R_A_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcAttachPin(MOTOR_R_A_Pin, MOTOR_R_A_Channel);  // (pin, channel)
+    ledcSetup( MOTOR_R_B_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcAttachPin(MOTOR_R_B_Pin, MOTOR_R_B_Channel);  // (pin, channel)
 
     //new way (v3.x)
     //ledcAttach(MOTOR_L_A_Pin, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION);
@@ -35,6 +35,16 @@ void initializationMotors(void){
     ledcWrite(MOTOR_R_B_Channel, 0);
 }
 
+//Init Buzzer:
+void initBuzzer() {
+    tone(BUZ_PIN, 500);
+    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
+    noTone(BUZ_PIN);
+    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
+    tone(BUZ_PIN, 1000);
+    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)  
+    noTone(BUZ_PIN);
+}
 
 //Tank Forward
 void TankForward(int motor_speed){
@@ -65,4 +75,30 @@ void setServo(int angl){
   angl=constrain(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE);
   int pos = map(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE, 178, 0); //set servo pos
   servoMotor.write(pos);
+}
+
+//Tank Signal
+void TankBuz(int signal){
+  struct {
+    int firstTone, firstDelay, secondTone, secondDelay;
+  } buz_signal;
+ 
+  switch (signal) {
+    case SIGNAL_GO:
+      buz_signal={200, 50, 500, 50};
+      break;
+    case SIGNAL_NOPATH:
+      buz_signal={500, 1000, 100, 10};
+      break;
+    case SIGNAL_OBSTACLE:
+      buz_signal={500, 1000, 500, 1000};
+      break;     
+    default: 
+      buz_signal={100, 10, 100, 10}; 
+  }
+  tone(BUZ_PIN, buz_signal.firstTone);
+  delay(buz_signal.firstDelay);
+  tone(BUZ_PIN, buz_signal.secondTone);
+  delay(buz_signal.secondDelay);
+  noTone(BUZ_PIN);
 }
