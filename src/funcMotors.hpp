@@ -15,7 +15,7 @@ void TankStop(void);
 //SERVO
 //Servo intialization
 void initServo(void);
-//Set Servo from - 86 (0) +86 degrees
+//Set Servo from - 90 (0) +90 degrees
 void setServo(int angl);
 
 //Tank Signal

@@ -68,7 +68,7 @@
 //servo with min/max pulse widths:
 #define SERVO_MIN_PULSE 450  //350
 #define SERVO_MAX_PULSE 2390 //2400
-#define SERVO_MAX_ANGLE 90 //Maximum rotation angle from the center position - 0 + //86
+#define SERVO_MAX_ANGLE 90 //Maximum rotation angle from the center position - 0 + 90 degrees
 #define PIN_SERVO 23 //GPIO 23 servo
 #define SERVO_Channel 14
 #define SERVO_PWM_FREQ 50
