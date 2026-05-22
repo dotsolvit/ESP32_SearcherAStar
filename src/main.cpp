@@ -89,7 +89,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
 
 
 
-    vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс для зменшення навантаження (poll every 100ms)
+    //vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс для зменшення навантаження (poll every 100ms)
     
     if(pr_show) { // перевіряємо скільки залишилось слів в стеку (check of stack remain)
       Serial.println("uxTaskGetStackHighWaterMark(driveTaskHandle): " + String(uxTaskGetStackHighWaterMark(driveTaskHandle))); // виводимо залишок стека (print stack high water mark)
