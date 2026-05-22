@@ -10,6 +10,7 @@
 #include "funcOLED.hpp"
 #include "funcIRSensors.hpp"
 #include "funcMotors.hpp" 
+#include "funcPilot.hpp"
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
@@ -32,6 +33,12 @@ extern int currentAngle, displayed_currentAngle; //Текущий угол по 
 extern int distancePulseCounterLeft;
 extern int distancePulseCounterRight;
 
+//pathIndexForGo
+int pathIndexForGo;
+
+//Current tank speed
+int currentTankSpeed;
+
 //STAGES:
 #define STAGE_WAITE 0
 #define STAGE_FINDPATH 1
@@ -40,6 +47,21 @@ extern int distancePulseCounterRight;
 
 //Stage
 byte stage, displayed_stage;
+
+
+//Angle
+int currentAngle, displayed_currentAngle; //Текущий угол по Х
+
+//Movement stage:
+#define MOVEMENT_WAIT 0
+#define MOVEMENT_INIT 1
+#define MOVEMENT_TURN 2
+#define MOVEMENT_FORWARD 3
+#define MOVEMENT_STOP 4
+#define MOVEMENT_STOP_SCANNER 5
+
+byte movementStage;
+
 
 // змінні для обміну даними між задачами (variables for data exchange between tasks)
 byte sendedByte, receivedByte; 
@@ -105,6 +127,7 @@ int initializationObstacleSet(){
 void initStage() {
     stage = STAGE_WAITE; // Початковий етап - очікування (Initial stage - waiting)
     displayed_stage = 255; // Невідображений етап (Undisplayed stage)
+    movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
 }
 
 
@@ -165,6 +188,7 @@ void cycleDrive(void){
             }
             else if(receivedByte == 'G') { //If get "GO" command
                 stage = STAGE_GO;
+                movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
                 //Distance covered:
                 finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
                 return;
@@ -178,7 +202,7 @@ void cycleDrive(void){
                 return; 
             }
         }
-
+        vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс для зменшення навантаження (poll every 100ms)
     }
 
     //Stage STAGE_FINDPATH *******************************************
@@ -211,41 +235,78 @@ void cycleDrive(void){
 
     //Stage STAGE_GO *******************************************
     if(stage == STAGE_GO){
-        //If we've even reached this stage
-        if(finishedDistanceCovered == 0){
+        if(movementStage == MOVEMENT_WAIT){
+            displayMessage(2, "MOVEMENT_WAIT", 0, "");
+            if (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
+                Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+                stage = STAGE_WAITE; //Stage Waiting control stage
+                return;
+            }
             //Distance covered counters:
             distancePulseCounterLeft = 0;
             distancePulseCounterRight = 0;  
-            
+            currentTankSpeed = 0; //Current tank speed is zero at the start of movement       
+            movementStage = MOVEMENT_INIT;
+        }
+        if(movementStage == MOVEMENT_INIT){
+            displayMessage(2, "MOVEMENT_INIT", 0, "");
+            if(pilotInit() != 0) { //If pilot initialization is unsuccessful
+                Serial.println("Pilot initialization is unsuccessful!");
+                stage = STAGE_WAITE; //Stage Waiting control stage
+                movementStage = MOVEMENT_WAIT; //
+                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                return;
+            }
             TankBuz(SIGNAL_GO);
             Serial.println("Start moving to the goal");
+            movementStage = MOVEMENT_TURN;
         }
-        currentDistanceCovered = odometer() + 1;
-        if(currentDistanceCovered < finishedDistanceCovered){ //Еще не доехали до след точки пути
-            //Сканируем наличие препятствий***************************************************
-            //,,,
-            //
+        if(movementStage == MOVEMENT_TURN){
+            displayMessage(2, "MOVEMENT_TURN", 0, "");
+            pilotTurn(); //Turn to the current point of the path
+            currentTankSpeed = 0; //Current tank speed is zero at the start of movement
+            movementStage = MOVEMENT_FORWARD;
+            displayMessage(2, "MOVEMENT_FORWARD", 0, "");
         }
-        else{
-            if(finishedDistanceCovered !=0){ //Если это было не начало пути
-                //Останавливаемся
-                TankStop();
-                vTaskDelay(250 / portTICK_PERIOD_MS); // затримка 250 мс до полної зупинки (250 ms delay to complete stop)
-                Serial.println("Tank stopped");
-                currentDistanceCovered = odometer();
-                currentAngle = getAngleX();
-                Serial.println("Current distance covered: " + String(currentDistanceCovered) + " cm"); 
-                // and other...
-                
-                stage = STAGE_WAITE;
-                return; //Завершение отработки пути (Finish path execution)
+        if(movementStage == MOVEMENT_FORWARD){
+            if(pilotScanner != 0) { //If the scanner detects a new obstacle
+                Serial.println("The scanner detects a new obstacle!");
+                pilotStop();
+                TankBuz(SIGNAL_OBSTACLE);
+                movementStage = MOVEMENT_STOP_SCANNER; //
             }
-            //WRM 
-            finishedDistanceCovered = 150; //For testing, let's say we need to cover 150 cm to reach the goal )
-            TankForward(200); //Tank Forward
-            Serial.println("Tank is moving forward");
+            else { 
+                //Go to the next point of the path
+                if(pilotForward() != 0) {
+                    Serial.println("Stop!");
+                    pilotStop();
+                    //If we have reached the final point of the journey
+                    if(pathIndexForGo == 0){
+                    TankBuz(SIGNAL_GO);
+                    xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                    stage = STAGE_WAITE;
+                    Serial.println("It is Goal Point!");
+
+                    //Для контроля высылаем на сайт координаты - текущие и целевые
+                    //sendToWebsiteRealCoords();
+                    return;
+                    }
+                    movementStage = MOVEMENT_TURN; //
+                }
+            }
         }
+        if(movementStage == MOVEMENT_STOP_SCANNER){
+            displayMessage(2, "STOP_SCANNER", 0, "");
+            pilotStopScanner();
+            xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+            stage = STAGE_WAITE; //Stage Waiting control stage
+            //Для контроля высылаем на сайт координаты - текущие и целевые
+            //sendToWebsiteRealCoords();
+            return;
+        }
+        
     }
+
     //WRM Stage STAGE_RUN *******************************************
     if(stage == STAGE_RUN) {
         for(int i=-SERVO_MAX_ANGLE; i<= SERVO_MAX_ANGLE; i+=45){ //Test servo
