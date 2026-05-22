@@ -14,7 +14,7 @@
 //Battery monitoring period (in milliseconds)
 #define BATTERY_MONITORING_PERIOD 2000
 //EMA filtering coefficient (from 0.0 to 1.0)
-#define EMA_FILTERING_COEFFICIENT 0.5 
+#define EMA_FILTERING_COEFFICIENT 0.25 
 
 #define STEP_COST 50
 #define TURN_COST 1
