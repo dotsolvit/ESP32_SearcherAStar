@@ -69,13 +69,25 @@ void displayAngle(int angle){
 //Display battery
 void displayBattery(void){
     static int prev_percentage = -1; // Змінна для збереження останнього відображеного відсотка заряду (Variable to store the last displayed battery percentage)
+    static unsigned long timeLastMeasurement = 0; // Змінна для збереження часу останнього вимірювання (Variable to store the time of the last measurement)
+    static float filteredValue = 0.0;
+    if (millis() - timeLastMeasurement < BATTERY_MONITORING_PERIOD) {
+        return; // Повертаємося, якщо ще не минуло достатньо часу для наступного вимірювання (Return if it's not time for the next measurement yet)
+    }
+    timeLastMeasurement = millis();
+  
     // 1. Measurement
     int analogBatt=analogRead(PIN_BAT);
     float voltage = (float(analogBatt) / 4095.0) * 3.30 * RESISTOR_RATIO;
     // 2. Conversion to percentage (for 2S Li-ion 0%=6.6V - 100%=8.4V)
     int percentage = map(voltage * 100, 660, 840, 0, 100);
     percentage = constrain(percentage, 0, 100); 
-    // 3. Display only if percentage has changed (to reduce flickering and unnecessary updates)
+    // 3. EMA filtering
+    if(percentage > 0){
+      if(filteredValue == 0.0) filteredValue = float(percentage); // Initialize filteredValue on the first measurement
+      filteredValue = filteredValue + EMA_FILTERING_COEFFICIENT * (float(percentage) - filteredValue);
+      percentage = int(filteredValue);
+    }
     if (percentage != prev_percentage) {
         prev_percentage = percentage; // Update the last displayed percentage
         // 4. Display on OLED   

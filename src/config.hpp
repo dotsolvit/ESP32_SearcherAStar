@@ -7,8 +7,14 @@
 #define BUZ_PIN 4 //Buzzer
 //ADC1 GPIO 34 – IR sensor
 #define PIN_IR 34
+
+//Battery voltage control
 //ADC1 GPIO 35 – battery control
 #define PIN_BAT 35
+//Battery monitoring period (in milliseconds)
+#define BATTERY_MONITORING_PERIOD 2000
+//EMA filtering coefficient (from 0.0 to 1.0)
+#define EMA_FILTERING_COEFFICIENT 0.5 
 
 #define STEP_COST 50
 #define TURN_COST 1
