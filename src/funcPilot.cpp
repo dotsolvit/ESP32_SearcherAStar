@@ -43,3 +43,11 @@ void pilotTurn() {
     }
     else Serial.println("The angle is the same");
 }
+
+//The scanner for detect a new obstacle
+int pilotScanner(void) { 
+    //Here should be the code for scanning the environment with IR sensors and updating the obstacle set if a new obstacle is detected
+    //For now, we will just return 0, which means that no new obstacle has been detected
+    return 0; 
+}
+

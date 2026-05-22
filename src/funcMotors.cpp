@@ -7,6 +7,9 @@
 
 #include "config.hpp"
 #include "funcMotors.hpp"
+#include "funcMPU6050.hpp"
+#include "funcTransfCoordsAngles.hpp"
+#include "funcOLED.hpp"
 
 //Servo servoMotor;  // Створюємо об'єкт сервопривода
 
@@ -61,6 +64,70 @@ void TankStop(void){
   ledcWrite(MOTOR_L_B_Channel, 0);
   ledcWrite(MOTOR_R_A_Channel, 0);
   ledcWrite(MOTOR_R_B_Channel, 0);
+}
+
+
+//Turn the tank to a new course angle
+void TankRorateOnAngle(int new_angle){
+  int cur_angle = getAngleX();
+  int start_diff = differenceInAngles(new_angle,cur_angle,0);
+  int onRight = ( start_diff > 0 ) ? 1 : -1;
+  //test
+  Serial.print("start_diff ="); Serial.print(start_diff);
+  Serial.print("onRight ="); Serial.print(onRight);
+  //
+  if(abs(start_diff) > 15){
+    while (true){
+        cur_angle= getAngleX();
+        int diff=differenceInAngles(new_angle,cur_angle, 0);
+        //Show diff: 
+        displayMessage(3, "Diff= ", diff, " ");
+        //
+        if( abs(diff) <= 10 ) break;
+        if( diff > 0){
+          TankRotateRight(50);
+        }
+        else{    
+          if(differenceInAngles(new_angle,cur_angle,onRight) >= -10) break;
+          Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(50)");
+          TankRotateLeft(50);  
+        }
+    }
+  }
+  while (true){
+      cur_angle= getAngleX();
+      int diff=differenceInAngles(new_angle,cur_angle, 0);
+      //Show diff: 
+      displayMessage(3, "Diff= ", diff, " ");
+      //
+      if( abs(diff) <= 1 ) break;
+      if( diff > 0){
+        TankRotateRight(25);     //30
+      }
+      else{
+        Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(25)");
+        TankRotateLeft(25);      //30   
+      }
+  }
+  return ;
+}
+
+void TankRotateLeft(int pause){
+  ledcWrite(MOTOR_L_A_Channel, 0);
+  ledcWrite(MOTOR_L_B_Channel, 220);
+  ledcWrite(MOTOR_R_A_Channel, 220);
+  ledcWrite(MOTOR_R_B_Channel, 0);
+  delay(pause);
+  TankStop();
+}
+
+void TankRotateRight(int pause){
+  ledcWrite(MOTOR_L_A_Channel, 220);
+  ledcWrite(MOTOR_L_B_Channel, 0);
+  ledcWrite(MOTOR_R_A_Channel, 0);
+  ledcWrite(MOTOR_R_B_Channel, 220);
+  delay(pause);
+  TankStop();
 }
 
 //SERVO
