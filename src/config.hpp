@@ -5,8 +5,12 @@
 #define LED_BUILTIN 2
 
 #define BUZ_PIN 4 //Buzzer
+
+//IR distance sensor
 //ADC1 GPIO 34 – IR sensor
 #define PIN_IR 34
+#define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
+#define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
 
 //Battery voltage control
 //ADC1 GPIO 35 – battery control
@@ -80,10 +84,18 @@
 #define SERVO_PWM_FREQ 50
 #define SERVO_PWM_RESOLUTION 16
 
+//Scanner
+#define SCANNING_PERIOD 50 //scanning period 50 ms
+#define SCANNING_ANGLE_STEP 6 //scanning angle step 6 degrees - tan(6 degrees) = 10/100 cm
+
 //Tank signals:
 #define SIGNAL_GO 0
 #define SIGNAL_NOPATH 1
 #define SIGNAL_OBSTACLE 2
+
+//Jurnal:
+#define JOURNAL_SIZE 50 //Максимум записей в журнале (Maximum number of entries in the journal)
+#define JOURNAL_MESSAGE_LENGTH 50 //Максимальная длина сообщения в журнале (Maximum length of a message in the journal)
 
 //Структура координат сітки
 struct Coord {

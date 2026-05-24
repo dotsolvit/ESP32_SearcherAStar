@@ -6,7 +6,7 @@
 
 #include "config.hpp"
 #include "ssid.h"
-#include "funcWiFiWeb.h"
+#include "funcWiFiWeb.hpp"
 
 #include <WiFi.h>
 #include <WebServer.h>
@@ -25,6 +25,10 @@ extern realCoord realCoordsCurrent, realCoordsGoal;
 extern SemaphoreHandle_t xMutex;
 
 extern QueueHandle_t toWebQueue, toDriveQueue;   // two FreeRTOS queues: toWeb and toDrive (in main.cpp)
+
+//Jurnal:
+extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
+extern int journalIndex; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
 
 WebServer server(80);  // Вебсервер на порту 80 (Web server on port 80)
 
@@ -95,7 +99,9 @@ void Web_starting(){
   server.on("/findpath", handle_findpath);  //Actions when pressing find path
   server.on("/sendgo", handle_sendgo); //Actions when pressing send go
   server.on("/sendrun", handle_sendrun); //Actions when pressing send run
+  server.on("/sendtest", handle_sendtest); //Actions when pressing send test
   server.on("/seemap", handle_seemap); //Actions when pressing see map
+  server.on("/seejurnal", handle_seejurnal); //Actions when pressing see journal
   server.on("/seemapup", handle_seemapup);  //Actions when pressing See Map Up 10
   server.on("/seemapdown", handle_seemapdown);  //Actions when pressing See Map Down 10
   server.begin(); //Starting the web server
@@ -171,6 +177,29 @@ void handle_sendrun(void) {
   server.sendHeader("Location", "/"); //Redirect to the main page
   server.send(303);
 }
+
+//Actions when pressing send test
+void handle_sendtest(void) {
+  Serial.println("T"); //Send Test command to Serial
+  byte sendedByteW = 'T'; //Set Test command to sendedByte
+  xQueueSend(toDriveQueue, &sendedByteW, 0); //Send Run command to toDriveQueue
+  server.sendHeader("Location", "/"); //Redirect to the main page
+  server.send(303);
+}
+
+//Actions when pressing see journal
+void handle_seejurnal(void) {
+  String journalHTML = "<h2>Journal</h2><ul>";
+  journalHTML += "<p>" + String(journalIndex) + "</p>";
+  for (int i = 0; i < journalIndex; i++) {
+    if (strlen(journal[i]) > 0) { // Check if the journal entry is not empty
+      journalHTML += "<li>" + String(journal[i]) + "</li>"; // Add journal entry to HTML list
+    }
+  }
+  journalHTML += "</ul><button onclick=\"location.href='/'\">Home</button>"; // Add a button to return to the home page
+  server.send(200, "text/html", journalHTML); // Send the generated HTML page with the journal entries
+}
+
 //Actions when pressing See Map
 void handle_seemap(void) {
   web_messageMap=mapObstacleAndPath(top_line_number);
@@ -235,10 +264,11 @@ String SendHTML(void) {
           <button onclick="location.href='/findpath'">Find Path</button>
           <br>
           <button onclick="location.href='/sendgo'">Send Go</button>
-          
           <button onclick="location.href='/sendrun'">Send Run</button>
+          <button onclick="location.href='/sendtest'">Send Test</button>
           <br>
           <button onclick="location.href='/seemap'">See Map</button>
+          <button onclick="location.href='/seejurnal'">See Journal</button>
         </div>
     </body>
     </html>

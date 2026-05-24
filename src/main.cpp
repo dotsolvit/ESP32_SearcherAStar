@@ -6,7 +6,7 @@
 #include <Wire.h>
 #include "config.hpp" 
 #include "funcDrive.hpp"
-#include "funcWiFiWeb.h"
+#include "funcWiFiWeb.hpp"
 #include "funcOLED.hpp"
 #include "funcMPU6050.hpp"
 #include "funcMotors.hpp"
@@ -35,6 +35,11 @@ TaskHandle_t webTaskHandle = NULL;
 
 volatile int currentAngle, displayed_currentAngle ; //Текущий угол по Х
 
+//Jurnal:
+char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
+int journalIndex = 0; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
+
+
 //Distance covered counters:
 volatile int distancePulseCounterLeft = 0;
 volatile int distancePulseCounterRight = 0;
@@ -53,7 +58,6 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   
   //Servo intialization
   initServo();
-  setServo(0);
    
   initDisplay(); //Display initialization
   //Init Buzzer:

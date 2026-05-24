@@ -1,4 +1,4 @@
-//funcWiFiWeb.h
+//funcWiFiWeb.hpp
 //Модуль фунукццій для роботи з WiFi та веб-сервером на ESP32
 
 //Connecting to WiFi in STA mode
@@ -19,6 +19,12 @@ void handle_sendgo(void);
 
 //Actions when pressing send run
 void handle_sendrun(void);
+
+//Actions when pressing send test
+void handle_sendtest(void);
+
+//Actions when pressing see journal
+void handle_seejurnal(void);
 
 //Actions when pressing send y x
 void handle_sendyx(void);

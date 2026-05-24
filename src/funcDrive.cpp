@@ -44,13 +44,17 @@ int currentTankSpeed;
 #define STAGE_FINDPATH 1
 #define STAGE_GO 2
 #define STAGE_RUN 3 //STAGE_FINDPATH + STAGE_GO
+#define STAGE_TEST 4
 
 //Stage
 byte stage, displayed_stage;
 
 
 //Angle
-int currentAngle, displayed_currentAngle; //Текущий угол по Х
+extern int currentAngle, displayed_currentAngle; //Текущий угол по Х
+
+//Scanner angle:    
+int scannerAngle;
 
 //Movement stage:
 #define MOVEMENT_WAIT 0
@@ -153,6 +157,9 @@ void cycleDrive(void){
         } else if(stage == STAGE_RUN) {
             displayMessage(1, "Stage: RUN", 0, "");
             Serial.println("RUN");
+        } else if(stage == STAGE_TEST) {
+            displayMessage(1, "Stage: TEST", 0, "");
+            Serial.println("TEST");    
         } else {
             displayMessage(1, "Stage: UNKNOWN", 0, "");
             Serial.println("UNKNOWN");
@@ -199,6 +206,10 @@ void cycleDrive(void){
             }
             else if(receivedByte == 'R') { //If get "Run" command
                 stage = STAGE_RUN;
+                return; 
+            }
+             else if(receivedByte == 'T') { //If get "Test" command
+                stage = STAGE_TEST;
                 return; 
             }
         }
@@ -313,8 +324,28 @@ void cycleDrive(void){
             setServo(i);
             delay(800);     
         }
+
         stage = STAGE_WAITE;
         return;
     }
+
+    //WRM Stage STAGE_TEST *******************************************
+    if(stage == STAGE_TEST) {
+        initJournal(); //Init journal
+
+        for(int i=0; i<50; i++) { //Test journal
+            //The scanner for detect a new obstacle
+            int ret = pilotScanner() ;
+
+
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс (poll every 100ms)
+        }
+        
+        scannerAngle = 0; //Set scanner angle to 0  
+        setServo(scannerAngle);
+        //Here should be the code for testing the robot
+        stage = STAGE_WAITE;
+        return;
+    }   
 
 }

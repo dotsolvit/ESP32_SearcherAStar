@@ -13,6 +13,9 @@
 
 //Servo servoMotor;  // Створюємо об'єкт сервопривода
 
+//Scanner angle:    
+extern int scannerAngle;
+
 //Motor initialization
 void initializationMotors(void){
     // Attach pins to channels
@@ -137,7 +140,8 @@ void initServo(void){
   ledcSetup(SERVO_Channel, SERVO_PWM_FREQ, SERVO_PWM_RESOLUTION);
   // Attaching the channel to the ESP32 pin
   ledcAttachPin(PIN_SERVO, SERVO_Channel);
-  setServo(0); //set to 0 (servo 90 degrees)   
+  scannerAngle = 0; //Initial scanner angle
+  setServo(scannerAngle); //set to 0 (servo 90 degrees)   
 }
 
 //Set Servo from - 90 (0) +90 degrees
@@ -145,7 +149,7 @@ void setServo(int angl){
   angl=constrain(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE);
   float min=0.065536 * SERVO_PWM_FREQ * SERVO_MIN_PULSE;
   float max=0.065536 * SERVO_PWM_FREQ * SERVO_MAX_PULSE;
-  int pos = map(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE, int(max), int(min)); //set servo pos
+  int pos = map(angl, SERVO_MAX_ANGLE, -SERVO_MAX_ANGLE, int(max), int(min)); //set servo pos
   ledcWrite(SERVO_Channel, pos);
 }
 
