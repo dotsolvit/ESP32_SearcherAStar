@@ -85,8 +85,8 @@
 #define SERVO_PWM_RESOLUTION 16
 
 //Scanner
-#define SCANNING_PERIOD 50 //scanning period 50 ms
-#define SCANNING_ANGLE_STEP 6 //scanning angle step 6 degrees - tan(6 degrees) = 10/100 cm
+#define SCANNING_PERIOD 150 //45 //scanning period 50 ms
+#define SCANNING_ANGLE_STEP 12 //6 //scanning angle step 6 degrees - tan(6 degrees) = 10/100 cm
 
 //Tank signals:
 #define SIGNAL_GO 0

@@ -30,6 +30,9 @@ extern int scannerAngle;
 extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
 extern int journalIndex; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
 
+//WRM
+unsigned long firstScanTime = 0;
+
 //Pilot initialization
 int pilotInit() {
     if(pathSetPar.setSize==0 or pathSetPar.setSize==1){
@@ -70,34 +73,46 @@ void pilotStop(void) {
 //The scanner for detect a new obstacle
 int pilotScanner(void) { 
     static unsigned long lastScanTime = 0;
-    static int measurement_number = 0; //Counter for measurements
-    static int previousDistance = 0; //Previous distance measurement
+    //static int measurement_number = 0; //Counter for measurements
+    //static int previousDistance = 0; //Previous distance measurement
     int averagedDistance = 0; //Averaged distance measurement
 
     if (millis() - lastScanTime >= SCANNING_PERIOD) {
         lastScanTime = millis();
         int distance = IR_Distance();
         if(scannerAngle==0){
-            previousDistance = 0; 
-            measurement_number=0;
+            firstScanTime = millis();
+            //previousDistance = 0; 
+            //measurement_number=0;
             scannerAngle =SCANNING_ANGLE_STEP;
             setServo(scannerAngle);
         }
+        /*
         else if(measurement_number==0){
-            previousDistance = distance; //Set the first distance measurement as previous distance
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            int distance1 = IR_Distance();
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            int distance2 = IR_Distance();
+            String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) +",An=" + "S="+String(scannerAngle);
+            addToJournal(message.c_str()); // Add message to journal
+            //previousDistance = distance; //Set the first distance measurement as previous distance
             measurement_number++;
         }
+        */
         else {
-            if(distance == 0 or previousDistance==0) {
-                averagedDistance = 0; 
-            }
-            else 
-            averagedDistance = (previousDistance + distance) / 2; //Averaging the current and previous distance measurements
-            String message = "D1=" + String(previousDistance) +"D2=" + String(distance)+ "Do=" + String(averagedDistance) +",An=" + String(currentAngle)+"ScAn="+String(scannerAngle);
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            int distance1 = IR_Distance();
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            int distance2 = IR_Distance();
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            int distance3 = IR_Distance();
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            int distance4 = IR_Distance();
+            String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " 3=" + String(distance3)+ " 4=" + String(distance4) +",An=" + "S="+String(scannerAngle);
             addToJournal(message.c_str()); // Add message to journal
             //
-            previousDistance = 0;
-            measurement_number=0; //Reset the measurement counter
+            //previousDistance = 0;
+            //measurement_number=0; //Reset the measurement counter
             //
             if(scannerAngle > 0) scannerAngle = -SCANNING_ANGLE_STEP;
             else scannerAngle = SCANNING_ANGLE_STEP;

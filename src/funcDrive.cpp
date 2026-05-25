@@ -333,12 +333,12 @@ void cycleDrive(void){
     if(stage == STAGE_TEST) {
         initJournal(); //Init journal
 
-        for(int i=0; i<50; i++) { //Test journal
+        for(int i=0; i<300; i++) { //Test journal
             //The scanner for detect a new obstacle
             int ret = pilotScanner() ;
 
 
-            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс (poll every 100ms)
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 10 мс (poll every 100ms)
         }
         
         scannerAngle = 0; //Set scanner angle to 0  

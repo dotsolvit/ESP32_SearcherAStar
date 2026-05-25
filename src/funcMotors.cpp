@@ -149,7 +149,7 @@ void setServo(int angl){
   angl=constrain(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE);
   float min=0.065536 * SERVO_PWM_FREQ * SERVO_MIN_PULSE;
   float max=0.065536 * SERVO_PWM_FREQ * SERVO_MAX_PULSE;
-  int pos = map(angl, SERVO_MAX_ANGLE, -SERVO_MAX_ANGLE, int(max), int(min)); //set servo pos
+  int pos = map(angl, -SERVO_MAX_ANGLE, SERVO_MAX_ANGLE, int(max), int(min)); //set servo pos
   ledcWrite(SERVO_Channel, pos);
 }
 
