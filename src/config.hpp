@@ -6,11 +6,20 @@
 
 #define BUZ_PIN 4 //Buzzer
 
+//Ultrasonic sensor pins
+#define TRIG_PIN 27
+#define ECHO_PIN 34
+#define ULTRASONIC_MAX_DISTANCE 150 //the maximum distance that the ultrasonic sensor can measure (in centimeters)
+#define ULTRASONIC_MIN_DISTANCE 20  //the minimum distance that the ultrasonic sensor can measure (in centimeters)
+//Scanner
+#define SCANNING_PERIOD 130 //45 //scanning period 50 ms
+#define SCANNING_ANGLE_STEP 12 //6 //scanning angle step 6 degrees - tan(6 degrees) = 10/100 cm
+
 //IR distance sensor
 //ADC1 GPIO 34 – IR sensor
-#define PIN_IR 34
-#define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
-#define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
+//#define PIN_IR 34
+//#define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
+//#define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
 
 //Battery voltage control
 //ADC1 GPIO 35 – battery control
@@ -84,9 +93,7 @@
 #define SERVO_PWM_FREQ 50
 #define SERVO_PWM_RESOLUTION 16
 
-//Scanner
-#define SCANNING_PERIOD 150 //45 //scanning period 50 ms
-#define SCANNING_ANGLE_STEP 12 //6 //scanning angle step 6 degrees - tan(6 degrees) = 10/100 cm
+
 
 //Tank signals:
 #define SIGNAL_GO 0
