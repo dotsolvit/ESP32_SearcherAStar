@@ -4,7 +4,7 @@
 void initDisplay(void);
 
 //Display distance to obstacles
-void displayDistance(void);
+void displayEchoDistance(void);
 
 //Display angle
 void displayAngle(int angle);

@@ -13,7 +13,7 @@
 
 #include "config.hpp"
 #include "funcOLED.hpp"
-#include "funcIRSensors.hpp"
+#include "funcSensors.hpp"
 
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
@@ -38,9 +38,9 @@ void initDisplay(void){
 }
 
 //Display distance to obstacles
-void displayDistance(void){
+void displayEchoDistance(void){
   static int prev_distance = -1; // Змінна для збереження останнього відображенного расстояния (Variable to store the last displayed distance)
-  int distance = IR_Distance();
+  int distance = distanceEcho();
   if (distance != prev_distance) {
     prev_distance = distance; // Update the last displayed distance
     display.fillRect(35, 0, 51, 15, BLACK);

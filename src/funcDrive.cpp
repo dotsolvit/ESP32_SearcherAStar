@@ -8,7 +8,7 @@
 #include "funcFindPath.hpp"
 #include "funcTransfCoordsAngles.hpp"
 #include "funcOLED.hpp"
-#include "funcIRSensors.hpp"
+#include "funcSensors.hpp"
 #include "funcMotors.hpp" 
 #include "funcPilot.hpp"
 
@@ -174,10 +174,10 @@ void cycleDrive(void){
         displayAngle( currentAngle );
         // 
         displayBattery();  //Display battery
-        displayDistance(); //Display distance to obstacles
+        displayEchoDistance(); //Display distance to obstacles
         
         // WRM show distance to obstacles
-        int distance = IR_Distance();
+        int distance = distanceEcho();
         displayMessage(2, "Dist= ", distance, "cm");
         // WRM show distance covered
         int distanceCovered = odometer();
@@ -333,7 +333,7 @@ void cycleDrive(void){
     if(stage == STAGE_TEST) {
         initJournal(); //Init journal
 
-        for(int i=0; i<300; i++) { //Test journal
+        for(int i=0; i<200; i++) { //Test journal
             //The scanner for detect a new obstacle
             int ret = pilotScanner() ;
 

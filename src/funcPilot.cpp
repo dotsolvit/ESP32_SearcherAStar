@@ -7,7 +7,7 @@
 #include "funcMPU6050.hpp"
 #include "funcTransfCoordsAngles.hpp"
 #include "funcOLED.hpp"
-#include "funcIRSensors.hpp"
+#include "funcSensors.hpp"
 
 //Path array (in main.cpp):
 extern Coord pathSet[MAX_PATH_LENGH];
@@ -79,7 +79,7 @@ int pilotScanner(void) {
 
     if (millis() - lastScanTime >= SCANNING_PERIOD) {
         lastScanTime = millis();
-        int distance = IR_Distance();
+        int distance = distanceEcho();
         if(scannerAngle==0){
             firstScanTime = millis();
             //previousDistance = 0; 
@@ -90,9 +90,9 @@ int pilotScanner(void) {
         /*
         else if(measurement_number==0){
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance1 = IR_Distance();
+            int distance1 = distanceEcho();
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance2 = IR_Distance();
+            int distance2 = distanceEcho();
             String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) +",An=" + "S="+String(scannerAngle);
             addToJournal(message.c_str()); // Add message to journal
             //previousDistance = distance; //Set the first distance measurement as previous distance
@@ -101,13 +101,13 @@ int pilotScanner(void) {
         */
         else {
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance1 = IR_Distance();
+            int distance1 = distanceEcho();
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance2 = IR_Distance();
+            int distance2 = distanceEcho();
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance3 = IR_Distance();
+            int distance3 = distanceEcho();
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance4 = IR_Distance();
+            int distance4 = distanceEcho();
             String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " 3=" + String(distance3)+ " 4=" + String(distance4) +",An=" + "S="+String(scannerAngle);
             addToJournal(message.c_str()); // Add message to journal
             //

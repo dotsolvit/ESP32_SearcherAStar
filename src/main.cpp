@@ -10,6 +10,7 @@
 #include "funcOLED.hpp"
 #include "funcMPU6050.hpp"
 #include "funcMotors.hpp"
+#include "funcSensors.hpp"
 
 //Create arrays for shared use in tasks (Створюємо масиви для спільного використання у завданнях)
 //Створюємо шлях (як масив координат та його параметри) 
@@ -58,6 +59,8 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   
   //Servo intialization
   initServo();
+  //Sonic initialization
+  initEcho();
    
   initDisplay(); //Display initialization
   //Init Buzzer:
@@ -73,7 +76,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   displayMessage(1, "OK", 0, "");
 
   //Display distance to obstacles
-  displayDistance();
+  displayEchoDistance();
   //Display angle
   displayAngle( getAngleX() );
   //Display battery
