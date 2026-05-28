@@ -81,42 +81,29 @@ int pilotScanner(void) {
         lastScanTime = millis();
         int distance = distanceEcho();
         if(scannerAngle==0){
-            firstScanTime = millis();
-            //previousDistance = 0; 
-            //measurement_number=0;
-            scannerAngle =SCANNING_ANGLE_STEP;
+            if(firstScanTime == 0) firstScanTime  = millis();
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+            int distance1 = distanceEcho();
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+            int distance2 = distanceEcho();
+            int distanceM= medianFilter(distance, distance1, distance2); // Apply median filter to the three measurements
+            String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
+            addToJournal(message.c_str()); // Add message to journal
+
+            scannerAngle =-SCANNING_ANGLE_STEP;
             setServo(scannerAngle);
         }
-        /*
-        else if(measurement_number==0){
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance1 = distanceEcho();
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance2 = distanceEcho();
-            String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) +",An=" + "S="+String(scannerAngle);
-            addToJournal(message.c_str()); // Add message to journal
-            //previousDistance = distance; //Set the first distance measurement as previous distance
-            measurement_number++;
-        }
-        */
         else {
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
             int distance1 = distanceEcho();
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
             int distance2 = distanceEcho();
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance3 = distanceEcho();
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 2 мс
-            int distance4 = distanceEcho();
-            String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " 3=" + String(distance3)+ " 4=" + String(distance4) +",An=" + "S="+String(scannerAngle);
+            int distanceM= medianFilter(distance, distance1, distance2); // Apply median filter to the three measurements   
+            String message = String(lastScanTime-firstScanTime)+" 0=" + String(distance) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
             addToJournal(message.c_str()); // Add message to journal
-            //
-            //previousDistance = 0;
-            //measurement_number=0; //Reset the measurement counter
-            //
-            if(scannerAngle > 0) scannerAngle = -SCANNING_ANGLE_STEP;
-            else scannerAngle = SCANNING_ANGLE_STEP;
-            //Turn the servo to the new scanning angle
+
+            if(scannerAngle == 0) scannerAngle = -SCANNING_ANGLE_STEP;
+            else scannerAngle = 0;
             setServo(scannerAngle);
         }
     }
@@ -143,5 +130,16 @@ void addToJournal(const char* message) {
         journalIndex++; // Увеличиваем индекс для следующей записи (Increment index for next entry)
     } else {
         Serial.println("Journal is full! Cannot add more entries."); // Журнал полон (Journal is full)
+    }
+}
+
+//median filter: from three numbers, the program selects the one that is in the middle in value
+int medianFilter(int a, int b, int c) {
+    if (a <= b && a <= c) {
+        return (b <= c) ? b : c;
+    } else if (b <= a && b <= c) {
+        return (a <= c) ? a : c;
+    } else {
+        return (a <= b) ? a : b;
     }
 }

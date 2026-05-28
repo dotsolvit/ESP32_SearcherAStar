@@ -11,9 +11,11 @@
 #define ECHO_PIN 34
 #define ULTRASONIC_MAX_DISTANCE 150 //the maximum distance that the ultrasonic sensor can measure (in centimeters)
 #define ULTRASONIC_MIN_DISTANCE 20  //the minimum distance that the ultrasonic sensor can measure (in centimeters)
+#define ULTRASONIC_MAX_TIMEOUT 8700 //timeout for pulseIn in microseconds (150cm * 58us/cm)
+
 //Scanner
-#define SCANNING_PERIOD 130 //45 //scanning period 50 ms
-#define SCANNING_ANGLE_STEP 12 //6 //scanning angle step 6 degrees - tan(6 degrees) = 10/100 cm
+#define SCANNING_PERIOD 200 //45 //scanning period 50 ms
+#define SCANNING_ANGLE_STEP 15 //scanning angle step 15 degrees (for Ultrasonic sensor)
 
 //IR distance sensor
 //ADC1 GPIO 34 – IR sensor

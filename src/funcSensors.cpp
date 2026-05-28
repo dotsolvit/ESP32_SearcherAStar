@@ -22,7 +22,7 @@ int distanceEcho() {
   delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
 
-  int cm = pulseIn(ECHO_PIN, HIGH, 5000 ) / 58;  //86см примерно=5000 мкс
+  int cm = pulseIn(ECHO_PIN, HIGH, ULTRASONIC_MAX_TIMEOUT ) / 58;  //150см * 58 = 8700 мкс
   if(cm < ULTRASONIC_MIN_DISTANCE or cm > ULTRASONIC_MAX_DISTANCE) cm=0;
   return cm;
 }

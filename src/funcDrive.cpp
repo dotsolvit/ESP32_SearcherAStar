@@ -333,7 +333,7 @@ void cycleDrive(void){
     if(stage == STAGE_TEST) {
         initJournal(); //Init journal
 
-        for(int i=0; i<200; i++) { //Test journal
+        for(int i=0; i<400; i++) { //Test journal
             //The scanner for detect a new obstacle
             int ret = pilotScanner() ;
 
