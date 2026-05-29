@@ -63,6 +63,7 @@ int scannerAngle;
 #define MOVEMENT_FORWARD 3
 #define MOVEMENT_STOP 4
 #define MOVEMENT_STOP_SCANNER 5
+#define MOVEMENT_END_SCANNER 6
 
 byte movementStage;
 
@@ -176,9 +177,7 @@ void cycleDrive(void){
         displayBattery();  //Display battery
         displayEchoDistance(); //Display distance to obstacles
         
-        // WRM show distance to obstacles
-        int distance = distanceEcho();
-        displayMessage(2, "Dist= ", distance, "cm");
+
         // WRM show distance covered
         int distanceCovered = odometer();
         displayMessage(3, "Dist Covered= ", distanceCovered, "cm");
@@ -332,12 +331,12 @@ void cycleDrive(void){
     //WRM Stage STAGE_TEST *******************************************
     if(stage == STAGE_TEST) {
         initJournal(); //Init journal
+        //The circular scanner initiation 
+        initCircularScanner();
 
-        for(int i=0; i<400; i++) { //Test journal
+        for(int i=0; i<500; i++) { //Test journal
             //The scanner for detect a new obstacle
-            int ret = pilotScanner() ;
-
-
+            if(pilotScannerCircular() != 0) break; //If the scanning finishes
             vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 10 мс (poll every 100ms)
         }
         

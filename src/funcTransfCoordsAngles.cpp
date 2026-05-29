@@ -78,3 +78,9 @@ int distanceBetweenPoints(realCoord &coord_in, Coord &new_coord_in){
   double value = sqrt(dy);
   return int(value);
 }
+
+///////////////////////
+//Processing measurement data to find and install obstacles.
+int seekAndSetObstacle(int scannerAngle, int distanceM){
+  return 0;
+}

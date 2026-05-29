@@ -15,6 +15,12 @@ void pilotStop(void) ;
 //The scanner for detect a new obstacle
 int pilotScanner(void) ;
 
+//The circular scanner initiation 
+void initCircularScanner();
+
+//The circular scanner for detect a new obstacle
+int pilotScannerCircular(void) ;
+
 //Wide scan after stopping due to an obstacle
 void pilotStopScanner(void) ;
 

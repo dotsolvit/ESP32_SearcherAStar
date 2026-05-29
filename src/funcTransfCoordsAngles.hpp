@@ -21,3 +21,6 @@ int differenceInAngles(int a1, int a0, int parameter);
 
 //Calculating the distance between nodes
 int distanceBetweenPoints(realCoord &coord_in, Coord &new_coord_in);
+
+//Processing measurement data to find and install obstacles.
+int seekAndSetObstacle(int scannerAngle, int distanceM); 
