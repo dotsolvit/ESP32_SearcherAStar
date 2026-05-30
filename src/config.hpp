@@ -15,8 +15,10 @@
 
 //Scanner
 #define SCANNING_PERIOD 200 //scanning period 200 ms
-#define SCANNING_ANGLE_STEP 6//15 //scanning angle step 15 degrees (for Ultrasonic sensor)
+#define SCANNING_ANGLE_STEP 6 //scanning angle step 6 degrees 
 #define SCANNER_OFFSET 6 //offset for scanner (in centimeters)
+#define NARROW_SCANNING_DISTANCE 80 //cm
+#define NARROW_SCANNING_ANGLE_STEP 6 //narrow scanning angle step 6 degrees
 
 //IR distance sensor
 //ADC1 GPIO 34 – IR sensor

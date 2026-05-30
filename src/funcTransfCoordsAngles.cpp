@@ -99,3 +99,18 @@ int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scanne
   }
   return 0;
 }
+
+//Processing measurement data to find obstacles.
+int seekObstacle(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered, int scannerOffset, int scannerAngle, int distanceM){
+  //Calculating real coordinates of the scanner
+  realCoord scannerRealCoords = calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered + scannerOffset);
+  //Calculating real coordinates of the detected obstacle
+  realCoord obstacleRealCoords = calcRealCoords(scannerRealCoords, currentAngle + scannerAngle, distanceM);
+  //Transform real coordinates of the detected obstacle to grid coordinates
+  Coord obstacleCoords = TransformRealToGridCoords(obstacleRealCoords);
+  //We check whether such an obstacle exists in the obstacle array.
+  if(indexFindPointCoords(obstacleSet,obstacleSetPar, obstacleCoords)==-1) { //If the obstacle is new
+    return 1; //New obstacle detected
+  }
+  return 0;
+}

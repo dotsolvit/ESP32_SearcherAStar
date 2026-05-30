@@ -24,6 +24,9 @@ extern int pathIndexForGo;
 
 extern int currentAngle, displayed_currentAngle; //Текущий угол по Х
 
+//Distance covered:
+extern int currentDistanceCovered, finishedDistanceCovered;
+
 
 //Scanner angle:    
 extern int scannerAngle;
@@ -72,9 +75,37 @@ void pilotStop(void) {
 }
 
 
-//The scanner for detect a new obstacle
-int pilotScanner(void) { 
- 
+//The narrow scanner for detect a new obstacle
+int pilotNarrowcanner(void) { 
+    static unsigned long lastScanTime = 0;
+    int distance;
+    if (scannerAngle == 0) {
+        lastScanTime = millis();
+        scannerAngle = -NARROW_SCANNING_ANGLE_STEP; // Start from the leftmost position
+        setServo(scannerAngle);
+        Serial.println("Start scanning -NARROW_SCANNING_ANGLE_STEP");
+    }
+    if (millis() - lastScanTime >= SCANNING_PERIOD) {
+        lastScanTime = millis();
+        distance = IR_Distance();
+        if(distance > 0 and distance <= NARROW_SCANNING_DISTANCE) {
+            currentDistanceCovered=odometer();
+            if(seekObstacle(realCoordsCurrent, currentAngle, currentDistanceCovered, SCANNER_OFFSET, scannerAngle, distance) != 0 ) {
+                Serial.println("New obstacle detected by narrow scanner!");
+                String message = String(lastScanTime-journalInitTime)+" New=" + String(distance) + "S="+String(scannerAngle);
+                addToJournal(message.c_str()); // Add message to journ
+                scannerAngle = 0; 
+                setServo(scannerAngle);
+                return 1; // New obstacle detected
+            }
+        }
+        if(scannerAngle == NARROW_SCANNING_ANGLE_STEP) {
+            scannerAngle = -NARROW_SCANNING_ANGLE_STEP; // Move to the next position  
+        } else {
+            scannerAngle = NARROW_SCANNING_ANGLE_STEP; // Move to the next position 
+        }
+        setServo(scannerAngle);
+    }
     return 0; 
 }
 

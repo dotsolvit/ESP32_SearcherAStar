@@ -281,6 +281,7 @@ void cycleDrive(void){
             displayMessage(2, "MOVEMENT_FORWARD", 0, "");
         }
         if(movementStage == MOVEMENT_FORWARD){
+            /*
             if(pilotScanner != 0) { //If the scanner detects a new obstacle
                 Serial.println("The scanner detects a new obstacle!");
                 pilotStop();
@@ -306,6 +307,7 @@ void cycleDrive(void){
                     movementStage = MOVEMENT_TURN; //
                 }
             }
+            */
         }
         if(movementStage == MOVEMENT_STOP_SCANNER){
             displayMessage(2, "STOP_SCANNER", 0, "");
@@ -333,6 +335,17 @@ void cycleDrive(void){
     //WRM Stage STAGE_TEST *******************************************
     if(stage == STAGE_TEST) {
         initJournal(); //Init journal
+
+        //The narrow scanner test:
+        for(int i=0; i<500; i++) {
+            if(pilotNarrowcanner() != 0) {
+                Serial.println("TEST: New obstacle detected by narrow scanner!");
+                break;
+            }
+            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 10 мс (poll every 100ms)
+        }
+
+        /*
         //The circular scanner initiation 
         initCircularScanner();
 
@@ -349,7 +362,8 @@ void cycleDrive(void){
         else {
             Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
         }
-        
+        */
+
         scannerAngle = 0; //Set scanner angle to 0  
         setServo(scannerAngle);
         //Here should be the code for testing the robot
