@@ -23,4 +23,4 @@ int differenceInAngles(int a1, int a0, int parameter);
 int distanceBetweenPoints(realCoord &coord_in, Coord &new_coord_in);
 
 //Processing measurement data to find and install obstacles.
-int seekAndSetObstacle(int scannerAngle, int distanceM); 
+int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scannerOffset, int scannerAngle, int distanceM);

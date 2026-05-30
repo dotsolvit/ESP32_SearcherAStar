@@ -15,13 +15,14 @@
 
 //Scanner
 #define SCANNING_PERIOD 200 //scanning period 200 ms
-#define SCANNING_ANGLE_STEP 10//15 //scanning angle step 15 degrees (for Ultrasonic sensor)
+#define SCANNING_ANGLE_STEP 6//15 //scanning angle step 15 degrees (for Ultrasonic sensor)
+#define SCANNER_OFFSET 6 //offset for scanner (in centimeters)
 
 //IR distance sensor
 //ADC1 GPIO 34 – IR sensor
-//#define PIN_IR 34
-//#define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
-//#define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
+#define PIN_IR 34
+#define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
+#define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
 
 //Battery voltage control
 //ADC1 GPIO 35 – battery control

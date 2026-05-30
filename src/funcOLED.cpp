@@ -38,9 +38,10 @@ void initDisplay(void){
 }
 
 //Display distance to obstacles
-void displayEchoDistance(void){
+void displayDistance(void){
   static int prev_distance = -1; // Змінна для збереження останнього відображенного расстояния (Variable to store the last displayed distance)
-  int distance = distanceEcho();
+  //int distance = distanceEcho();
+  int distance = IR_Distance();
   if (distance != prev_distance) {
     prev_distance = distance; // Update the last displayed distance
     display.fillRect(35, 0, 51, 15, BLACK);

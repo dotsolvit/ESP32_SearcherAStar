@@ -4,6 +4,11 @@
 #include <Arduino.h>
 #include "config.hpp"       
 #include "funcTransfCoordsAngles.hpp"
+#include "funcArray.hpp"
+
+//Obstacle array (in main.cpp):
+extern Coord obstacleSet[MAX_OBSTACLE_LENGH];
+extern Par obstacleSetPar;
 
 //Перетворити реальні координати на координати сітки(Transform real coordinates to grid coordinates)
 Coord TransformRealToGridCoords(realCoord &coord_in ){
@@ -22,11 +27,11 @@ realCoord TransformGridToRealCoords(Coord &coord_in ){
 }
 
 //Розрахунок нових поточних координат(Calculation of new current coordinates)
-realCoord calcRealCoords(realCoord &coord_in, int angle_in, int dictance_mm){
+realCoord calcRealCoords(realCoord &coord_in, int angle_in, int dictance){
   realCoord coord_out = coord_in;
   float angle_rad = float(angle_in) * M_PI /180;
-  float dY = - sin(angle_rad) * dictance_mm /10; //в см, минус т.к. у нас угол по часовой стрелке
-  float dX = cos(angle_rad) * dictance_mm /10; //в см
+  float dY = - sin(angle_rad) * dictance; //в см, минус т.к. у нас угол по часовой стрелке
+  float dX = cos(angle_rad) * dictance; //в см
   coord_out.y += int(dY);
   coord_out.x += int(dX);
   return coord_out;
@@ -81,6 +86,16 @@ int distanceBetweenPoints(realCoord &coord_in, Coord &new_coord_in){
 
 ///////////////////////
 //Processing measurement data to find and install obstacles.
-int seekAndSetObstacle(int scannerAngle, int distanceM){
+int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scannerOffset, int scannerAngle, int distanceM){
+  //Calculating real coordinates of the scanner
+  realCoord scannerRealCoords = calcRealCoords(realCoordsCurrent, currentAngle, scannerOffset);
+  //Calculating real coordinates of the detected obstacle
+  realCoord obstacleRealCoords = calcRealCoords(scannerRealCoords, currentAngle + scannerAngle, distanceM);
+  //Transform real coordinates of the detected obstacle to grid coordinates
+  Coord obstacleCoords = TransformRealToGridCoords(obstacleRealCoords);
+  //We check whether such an obstacle exists in the obstacle array.
+  if(indexFindPointCoords(obstacleSet,obstacleSetPar, obstacleCoords)==-1) { //If the obstacle is new
+    int cod_ret=AddCoords(obstacleSet,obstacleSetPar, obstacleCoords);
+  }
   return 0;
 }

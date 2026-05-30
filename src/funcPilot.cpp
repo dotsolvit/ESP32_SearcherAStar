@@ -98,18 +98,18 @@ int pilotScannerCircular(void) {
 
     if (millis() - lastScanTime >= SCANNING_PERIOD) {
         lastScanTime = millis();
-        distance0 = distanceEcho();
+        distance0 = IR_Distance();
         vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
-        distance1 = distanceEcho(); 
+        distance1 = IR_Distance(); 
         vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
-        distance2 = distanceEcho();
+        distance2 = IR_Distance();
         int distanceM= medianFilter(distance0, distance1, distance2); // Apply median filter to the three measurements
         String message = String(lastScanTime-journalInitTime)+" 0=" + String(distance0) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
         addToJournal(message.c_str()); // Add message to journal
         scannerAngle += SCANNING_ANGLE_STEP; // Move to the next position
         if(scannerAngle <= SERVO_MAX_ANGLE) {
             setServo(scannerAngle);
-            if(distanceM > 0) seekAndSetObstacle(scannerAngle, distanceM); // Process the measurement to seek and set an obstacle
+            if(distanceM > 0) seekAndSetObstacle(realCoordsCurrent, currentAngle, SCANNER_OFFSET, scannerAngle, distanceM); // Process the measurement to seek and set an obstacle
         } else {
             scannerAngle = 0;
             setServo(scannerAngle);

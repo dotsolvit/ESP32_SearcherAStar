@@ -77,7 +77,7 @@ int currentDistanceCovered, finishedDistanceCovered;
 //Init Real Coordinates:
 void initRealCoords() {
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-      realCoordsCurrent={155, 125}; //Текущие 
+      realCoordsCurrent={170, 130}; //Текущие   170, 130
       realCoordsGoal={260, 210};   //Цель
       xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
@@ -96,6 +96,7 @@ int initializationObstacleSet(){
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
         //Clear Obstacle Set:
         ClearCoords(obstacleSet, obstacleSetPar);
+        /*
         //temporarily place obstacles manually (тимчасово розміщуємо перешкоди вручну)
         Coord obstacle;
         obstacle={0,0};
@@ -118,7 +119,8 @@ int initializationObstacleSet(){
         Serial.println(obstacleSet[0].y); // Виводимо координату y першої перешкоди для перевірки (Print y coordinate of the first obstacle for verification)
         Serial.println(obstacleSet[0].x); // Виводимо координату x
         //...........
-
+        */
+       
         xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
     else {
@@ -175,7 +177,7 @@ void cycleDrive(void){
         displayAngle( currentAngle );
         // 
         displayBattery();  //Display battery
-        displayEchoDistance(); //Display distance to obstacles
+        displayDistance(); //Display distance to obstacles
         
 
         // WRM show distance covered
@@ -334,10 +336,18 @@ void cycleDrive(void){
         //The circular scanner initiation 
         initCircularScanner();
 
-        for(int i=0; i<500; i++) { //Test journal
-            //The scanner for detect a new obstacle
-            if(pilotScannerCircular() != 0) break; //If the scanning finishes
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 10 мс (poll every 100ms)
+        if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
+
+            for(int i=0; i<500; i++) { //Test journal
+                //The scanner for detect a new obstacle
+                if(pilotScannerCircular() != 0) break; //If the scanning finishes
+                vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 10 мс (poll every 100ms)
+            }
+
+            xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+        }
+        else {
+            Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
         }
         
         scannerAngle = 0; //Set scanner angle to 0  

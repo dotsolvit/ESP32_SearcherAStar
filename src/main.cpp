@@ -60,7 +60,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   //Servo intialization
   initServo();
   //Sonic initialization
-  initEcho();
+  //initEcho();
    
   initDisplay(); //Display initialization
   //Init Buzzer:
@@ -76,7 +76,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   displayMessage(1, "OK", 0, "");
 
   //Display distance to obstacles
-  displayEchoDistance();
+  displayDistance();
   //Display angle
   displayAngle( getAngleX() );
   //Display battery

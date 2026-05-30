@@ -26,7 +26,7 @@ int distanceEcho() {
   if(cm < ULTRASONIC_MIN_DISTANCE or cm > ULTRASONIC_MAX_DISTANCE) cm=0;
   return cm;
 }
-/*
+
 //Display distance
 int IR_Distance(void){
   //analogRead= 0–4095 that read voltages from 0V to 3.3V
@@ -35,7 +35,7 @@ int IR_Distance(void){
   if(currentDist < IR_MIN_DISTANCE or currentDist > IR_MAX_DISTANCE) currentDist=0;
   return currentDist;
 }
-*/
+
 
 //distance counter - odometr
 int odometer(void){

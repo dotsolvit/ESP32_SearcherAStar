@@ -7,7 +7,7 @@ void initEcho();
 int distanceEcho(void);
 
 //Display distance
-//int IR_Distance(void);
+int IR_Distance(void);
 
 //distance counter - odometr
 int odometer(void);
