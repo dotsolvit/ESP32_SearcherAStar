@@ -76,9 +76,9 @@ void pilotStop(void) {
 
 
 //The narrow scanner for detect a new obstacle
-int pilotNarrowcanner(void) { 
+int pilotNarrowScanner(void) { 
     static unsigned long lastScanTime = 0;
-    int distance;
+    int distance0, distance1, distance2; //Distance measurements
     if (scannerAngle == 0) {
         lastScanTime = millis();
         scannerAngle = -NARROW_SCANNING_ANGLE_STEP; // Start from the leftmost position
@@ -87,16 +87,23 @@ int pilotNarrowcanner(void) {
     }
     if (millis() - lastScanTime >= SCANNING_PERIOD) {
         lastScanTime = millis();
-        distance = IR_Distance();
-        if(distance > 0 and distance <= NARROW_SCANNING_DISTANCE) {
-            currentDistanceCovered=odometer();
-            if(seekObstacle(realCoordsCurrent, currentAngle, currentDistanceCovered, SCANNER_OFFSET, scannerAngle, distance) != 0 ) {
-                Serial.println("New obstacle detected by narrow scanner!");
-                String message = String(lastScanTime-journalInitTime)+" New=" + String(distance) + "S="+String(scannerAngle);
-                addToJournal(message.c_str()); // Add message to journ
-                scannerAngle = 0; 
-                setServo(scannerAngle);
-                return 1; // New obstacle detected
+        distance0 = IR_Distance();
+        if(distance0 > 0 and distance0 <= NARROW_SCANNING_DISTANCE) {
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+            distance1 = IR_Distance(); 
+            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+            distance2 = IR_Distance();
+            int distanceM= medianFilter(distance0, distance1, distance2); // Apply median filter to the three measurements
+            if(distanceM > 0 and distanceM <= NARROW_SCANNING_DISTANCE) {
+                currentDistanceCovered=odometer();
+                if(seekObstacle(realCoordsCurrent, currentAngle, currentDistanceCovered, SCANNER_OFFSET, scannerAngle, distanceM) != 0 ) {
+                    Serial.println("New obstacle detected by narrow scanner!");
+                    String message = String(lastScanTime-journalInitTime)+" New=" + String(distanceM) + "S="+String(scannerAngle);
+                    addToJournal(message.c_str()); // Add message to journ
+                    scannerAngle = 0; 
+                    setServo(scannerAngle);
+                    return 1; // New obstacle detected
+                }
             }
         }
         if(scannerAngle == NARROW_SCANNING_ANGLE_STEP) {

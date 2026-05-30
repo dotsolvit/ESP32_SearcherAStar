@@ -13,7 +13,7 @@ int pilotForward(void) ;
 void pilotStop(void) ;  
 
 //The narrow scanner for detect a new obstacle
-int pilotNarrowcanner(void);
+int pilotNarrowScanner(void);
 
 //The circular scanner initiation 
 void initCircularScanner();

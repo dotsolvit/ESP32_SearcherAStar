@@ -338,7 +338,7 @@ void cycleDrive(void){
 
         //The narrow scanner test:
         for(int i=0; i<500; i++) {
-            if(pilotNarrowcanner() != 0) {
+            if(pilotNarrowScanner() != 0) {
                 Serial.println("TEST: New obstacle detected by narrow scanner!");
                 break;
             }
