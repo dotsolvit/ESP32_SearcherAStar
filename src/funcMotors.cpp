@@ -88,12 +88,12 @@ void TankRorateOnAngle(int new_angle){
         //
         if( abs(diff) <= 10 ) break;
         if( diff > 0){
-          TankRotateRight(50);
+          TankRotateRight(40); //50
         }
         else{    
           if(differenceInAngles(new_angle,cur_angle,onRight) >= -10) break;
           Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(50)");
-          TankRotateLeft(50);  
+          TankRotateLeft(40);  //50
         }
     }
   }
@@ -105,11 +105,11 @@ void TankRorateOnAngle(int new_angle){
       //
       if( abs(diff) <= 1 ) break;
       if( diff > 0){
-        TankRotateRight(25);     //30
+        TankRotateRight(20);   //25  //30
       }
       else{
-        Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(25)");
-        TankRotateLeft(25);      //30   
+        Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(20)");
+        TankRotateLeft(20);   //25   //30   
       }
   }
   return ;
@@ -117,19 +117,19 @@ void TankRorateOnAngle(int new_angle){
 
 void TankRotateLeft(int pause){
   ledcWrite(MOTOR_L_A_Channel, 0);
-  ledcWrite(MOTOR_L_B_Channel, 220);
-  ledcWrite(MOTOR_R_A_Channel, 220);
+  ledcWrite(MOTOR_L_B_Channel, SPEED_NORMAL);
+  ledcWrite(MOTOR_R_A_Channel, SPEED_NORMAL);
   ledcWrite(MOTOR_R_B_Channel, 0);
-  delay(pause);
+  vTaskDelay(pause / portTICK_PERIOD_MS); // delay(pause);
   TankStop();
 }
 
 void TankRotateRight(int pause){
-  ledcWrite(MOTOR_L_A_Channel, 220);
+  ledcWrite(MOTOR_L_A_Channel, SPEED_NORMAL);
   ledcWrite(MOTOR_L_B_Channel, 0);
   ledcWrite(MOTOR_R_A_Channel, 0);
-  ledcWrite(MOTOR_R_B_Channel, 220);
-  delay(pause);
+  ledcWrite(MOTOR_R_B_Channel, SPEED_NORMAL);
+  vTaskDelay(pause / portTICK_PERIOD_MS); // delay(pause);
   TankStop();
 }
 
@@ -173,8 +173,8 @@ void TankBuz(int signal){
       buz_signal={100, 10, 100, 10}; 
   }
   tone(BUZ_PIN, buz_signal.firstTone);
-  delay(buz_signal.firstDelay);
+  vTaskDelay(buz_signal.firstDelay / portTICK_PERIOD_MS);
   tone(BUZ_PIN, buz_signal.secondTone);
-  delay(buz_signal.secondDelay);
+  vTaskDelay(buz_signal.secondDelay / portTICK_PERIOD_MS);
   noTone(BUZ_PIN);
 }

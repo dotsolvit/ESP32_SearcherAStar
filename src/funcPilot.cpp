@@ -36,7 +36,7 @@ bool circularScannerActive = false; // Sign of a circular scanner in operation
 //Jurnal:
 extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
 extern int journalIndex; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
-unsigned long journalInitTime;
+extern unsigned long journalInitTime;
 
 //Pilot initialization
 int pilotInit() {
@@ -114,7 +114,7 @@ int pilotNarrowScanner(void) {
                 currentDistanceCovered=odometer();
                 if(seekObstacle(realCoordsCurrent, currentAngle, currentDistanceCovered, SCANNER_OFFSET, scannerAngle, distanceM) != 0 ) {
                     Serial.println("New obstacle detected by narrow scanner!");
-                    String message = String(lastScanTime-journalInitTime)+" D1=" + String(distance0) + " D2=" + String(distance1) + " D3=" + String(distance2) + " M=" + String(distanceM) + "S="+String(scannerAngle);
+                    String message = " D1=" + String(distance0) + " D2=" + String(distance1) + " D3=" + String(distance2) + " M=" + String(distanceM) + "S="+String(scannerAngle);
                     addToJournal(message.c_str()); // Add message to journ
                     scannerAngle = 0; 
                     setServo(scannerAngle);
@@ -160,7 +160,7 @@ int pilotScannerCircular(void) {
         vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
         distance2 = IR_Distance();
         int distanceM= medianFilter(distance0, distance1, distance2); // Apply median filter to the three measurements
-        String message = String(lastScanTime-journalInitTime)+" 0=" + String(distance0) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
+        String message = " 0=" + String(distance0) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
         addToJournal(message.c_str()); // Add message to journal
         scannerAngle += SCANNING_ANGLE_STEP; // Move to the next position
         if(scannerAngle <= SERVO_MAX_ANGLE) {
@@ -190,7 +190,9 @@ void initJournal() {
 //Function to add a message to the journal
 void addToJournal(const char* message) {
     if (journalIndex < JOURNAL_SIZE) {
-        strncpy(journal[journalIndex], message, JOURNAL_MESSAGE_LENGTH - 1); // Копируем сообщение в журнал (Copy message to journal)
+        String mes = String(millis()-journalInitTime)+" ";
+        mes += message;
+        strncpy(journal[journalIndex], mes.c_str(), JOURNAL_MESSAGE_LENGTH - 1); // Копируем сообщение в журнал (Copy message to journal)
         journal[journalIndex][JOURNAL_MESSAGE_LENGTH - 1] = '\0'; // Гарантируем нуль-терминирование (Ensure null-termination)
         journalIndex++; // Увеличиваем индекс для следующей записи (Increment index for next entry)
     } else {

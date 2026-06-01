@@ -88,6 +88,10 @@
 #define MOTOR_R_B_Channel 13 
 //speed adjustment between motors:
 #define SPEED_ADJUSTMENT 15  //17
+//speed settings:
+#define SPEED_NORMAL 220
+#define SPEED_SLOW 180
+
 
 //SERVO
 //servo with min/max pulse widths:
