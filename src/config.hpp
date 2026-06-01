@@ -15,6 +15,7 @@
 
 //Scanner
 #define SCANNING_PERIOD 200 //scanning period 200 ms
+#define SCANNING_ADDITIONAL_PERIOD 25 //scanning additional period 25 ms
 #define SCANNING_ANGLE_STEP 6 //scanning angle step 6 degrees 
 #define SCANNER_OFFSET 6 //offset for scanner (in centimeters)
 #define NARROW_SCANNING_DISTANCE 80 //cm

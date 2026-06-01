@@ -342,7 +342,7 @@ void cycleDrive(void){
                 Serial.println("TEST: New obstacle detected by narrow scanner!");
                 break;
             }
-            vTaskDelay(10 / portTICK_PERIOD_MS); // затримка 10 мс (poll every 100ms)
+            vTaskDelay(5 / portTICK_PERIOD_MS); // затримка 5 мс (poll every 100ms)
         }
 
         /*

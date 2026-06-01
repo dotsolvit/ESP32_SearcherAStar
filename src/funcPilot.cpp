@@ -78,27 +78,43 @@ void pilotStop(void) {
 //The narrow scanner for detect a new obstacle
 int pilotNarrowScanner(void) { 
     static unsigned long lastScanTime = 0;
-    int distance0, distance1, distance2; //Distance measurements
+    static int measurement_number = 0; // Counter for measurements
+    static int distance0, distance1, distance2; //Distance measurements
     if (scannerAngle == 0) {
         lastScanTime = millis();
         scannerAngle = -NARROW_SCANNING_ANGLE_STEP; // Start from the leftmost position
+        measurement_number = 0;
+        distance0 = distance1 = distance2 = 0; // Reset distance measurements
         setServo(scannerAngle);
         Serial.println("Start scanning -NARROW_SCANNING_ANGLE_STEP");
     }
-    if (millis() - lastScanTime >= SCANNING_PERIOD) {
-        lastScanTime = millis();
-        distance0 = IR_Distance();
-        if(distance0 > 0 and distance0 <= NARROW_SCANNING_DISTANCE) {
-            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+    if (millis() - lastScanTime >= (SCANNING_PERIOD + SCANNING_ADDITIONAL_PERIOD * measurement_number) ) {
+        if(measurement_number == 0) {
+            distance0 = IR_Distance();
+            distance1 = distance2 = 0; // Reset distance measurements
+            if(distance0 == 0 or distance0 > NARROW_SCANNING_DISTANCE) {
+                lastScanTime = millis();
+                measurement_number = 0;
+            }
+            else {
+                measurement_number = 1; // Move to the next measurement
+            }
+        }
+        else if(measurement_number == 1) {
             distance1 = IR_Distance(); 
-            vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+            distance2 = 0; // Reset distance measurements
+            measurement_number = 2; // Move to the next measurement
+        }
+        else if(measurement_number == 2) {
             distance2 = IR_Distance();
+            lastScanTime = millis();
+            measurement_number = 0; // Reset measurement number for the next scan
             int distanceM= medianFilter(distance0, distance1, distance2); // Apply median filter to the three measurements
             if(distanceM > 0 and distanceM <= NARROW_SCANNING_DISTANCE) {
                 currentDistanceCovered=odometer();
                 if(seekObstacle(realCoordsCurrent, currentAngle, currentDistanceCovered, SCANNER_OFFSET, scannerAngle, distanceM) != 0 ) {
                     Serial.println("New obstacle detected by narrow scanner!");
-                    String message = String(lastScanTime-journalInitTime)+" New=" + String(distanceM) + "S="+String(scannerAngle);
+                    String message = String(lastScanTime-journalInitTime)+" D1=" + String(distance0) + " D2=" + String(distance1) + " D3=" + String(distance2) + " M=" + String(distanceM) + "S="+String(scannerAngle);
                     addToJournal(message.c_str()); // Add message to journ
                     scannerAngle = 0; 
                     setServo(scannerAngle);
@@ -106,12 +122,14 @@ int pilotNarrowScanner(void) {
                 }
             }
         }
-        if(scannerAngle == NARROW_SCANNING_ANGLE_STEP) {
-            scannerAngle = -NARROW_SCANNING_ANGLE_STEP; // Move to the next position  
-        } else {
-            scannerAngle = NARROW_SCANNING_ANGLE_STEP; // Move to the next position 
+        if(measurement_number == 0) {
+            if(scannerAngle == NARROW_SCANNING_ANGLE_STEP) {
+                scannerAngle = -NARROW_SCANNING_ANGLE_STEP; // Move to the next position  
+            } else {
+                scannerAngle = NARROW_SCANNING_ANGLE_STEP; // Move to the next position 
+            }
+            setServo(scannerAngle);
         }
-        setServo(scannerAngle);
     }
     return 0; 
 }
