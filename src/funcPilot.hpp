@@ -10,7 +10,7 @@ void pilotTurn();
 int pilotForward(void) ;
 
 //Pilot stop
-void pilotStop(void) ;  
+int pilotStop(void) ;  
 
 //The narrow scanner for detect a new obstacle
 int pilotNarrowScanner(void);

@@ -31,6 +31,9 @@ extern int currentDistanceCovered, finishedDistanceCovered;
 //Scanner angle:    
 extern int scannerAngle;
 
+//Pilot speed:
+int pilotCurrentSpeed = 0;
+
 bool circularScannerActive = false; // Sign of a circular scanner in operation
 
 //Jurnal:
@@ -46,6 +49,7 @@ int pilotInit() {
         return -1; // Return an error code
     }
     pathIndexForGo=pathSetPar.setSize-1; //Index for path array, from which the robot will start moving
+    pilotCurrentSpeed = 0;
     return 0; // Return success code
 }
 
@@ -63,15 +67,54 @@ void pilotTurn() {
 
 //Pilot forward
 int pilotForward(void) {
-    //Here should be the code for moving the robot forward to the next waypoint in the path
-    //For now, we will just return 0, which means that the movement is successful
+    String message;
+    int distanceToTheNextPoint = distanceBetweenPoints(realCoordsCurrent, pathSet[pathIndexForGo-1]); // Distance to the next point in cm
+    currentDistanceCovered = odometer();
+
+    if(currentDistanceCovered >= distanceToTheNextPoint) return 0;
+    else if(currentDistanceCovered < DISTANCE_SPEED_SLOW or currentDistanceCovered > distanceToTheNextPoint -DISTANCE_SPEED_SLOW){
+        if(pilotCurrentSpeed != SPEED_SLOW) {
+            pilotCurrentSpeed = SPEED_SLOW;
+            TankForward(pilotCurrentSpeed);
+            message = "Speed slow. Distance covered:" + String(currentDistanceCovered) + " cm.";
+            addToJournal(message.c_str()); // Add message to journal
+        }
+    }
+    else if(pilotCurrentSpeed < SPEED_NORMAL) {
+        pilotCurrentSpeed = SPEED_NORMAL;
+        //Tank Forward
+        TankForward(pilotCurrentSpeed);
+        message = "Speed normal. Distance covered:" + String(currentDistanceCovered) + " cm.";
+        addToJournal(message.c_str()); // Add message to journal
+    }
     return 0; 
 }
 
 //Pilot stop
-void pilotStop(void) {
-  //....
-  TankStop();
+int pilotStop(void) {
+    String message;
+    int distanceToTheNextPoint = distanceBetweenPoints(realCoordsCurrent, pathSet[pathIndexForGo-1]); // Distance to the next point in cm
+    currentDistanceCovered = odometer(); 
+    if(currentDistanceCovered >= distanceToTheNextPoint) {
+        TankStop();
+        pilotCurrentSpeed = 0;
+        Serial.println("Stop");
+        message = "Stop. Distance covered: " + String(currentDistanceCovered) + " cm.";
+        addToJournal(message.c_str()); // Add message to journal
+        //full stop:
+        for(int i=0; i<20; i++) {
+            vTaskDelay(50 / portTICK_PERIOD_MS); // затримка 50 мс
+            int realDistanceCovered = odometer();
+            if(realDistanceCovered == currentDistanceCovered) {
+                Serial.print("realDistanceCovered = "); Serial.print(realDistanceCovered); Serial.print(" distanceToTheNextPoint = "); Serial.println(distanceToTheNextPoint);
+                message = "Full stop. Real distance covered: " + String(realDistanceCovered) + " cm.";
+                addToJournal(message.c_str()); // Add message to journal
+                return 1; // Stop successful
+            }
+            else currentDistanceCovered = realDistanceCovered; // Update the distance covered if the robot is still moving
+        }
+    }
+    return 0; // Not Stop 
 }
 
 

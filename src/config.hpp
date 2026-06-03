@@ -26,6 +26,13 @@
 #define PIN_IR 34
 #define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
 #define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
+//Coefficients of the approximating equation distance = A * x ^ B
+//5,0V :
+//#define COEFFICIENT_A 22261
+//#define COEFFICIENT_B -0.8476
+//4,8V :
+#define COEFFICIENT_A 24292
+#define COEFFICIENT_B -0.8586
 
 //Battery voltage control
 //ADC1 GPIO 35 – battery control
@@ -62,16 +69,10 @@
 #define IRSENSOR_LEFT_PIN 32
 #define IRSENSOR_RIGHT_PIN 33
 
-//distance per impulse cm
+//odometer - distance per impulse cm
 #define DISTANCE_PER_IMPULSE 1.028  // cm/pulse
+#define DISTANCE_SPEED_SLOW 15 //cm
 
-//Coefficients of the approximating equation distance = A * x ^ B
-//5,0V :
-//#define COEFFICIENT_A 22261
-//#define COEFFICIENT_B -0.8476
-//4,8V :
-#define COEFFICIENT_A 24292
-#define COEFFICIENT_B -0.8586
 
 // PWM settings for motors
 #define MOTORS_PWM_FREQ 5000
@@ -87,7 +88,7 @@
 #define MOTOR_R_A_Channel 12
 #define MOTOR_R_B_Channel 13 
 //speed adjustment between motors:
-#define SPEED_ADJUSTMENT 15  //17
+#define SPEED_ADJUSTMENT 8  //15 //17
 //speed settings:
 #define SPEED_NORMAL 220
 #define SPEED_SLOW 180
