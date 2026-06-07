@@ -71,7 +71,7 @@
 
 //odometer - distance per impulse cm
 #define DISTANCE_PER_IMPULSE 1.028  // cm/pulse
-#define DISTANCE_SPEED_SLOW 15 //cm
+
 
 
 // PWM settings for motors
@@ -91,7 +91,11 @@
 #define SPEED_ADJUSTMENT 8  //15 //17
 //speed settings:
 #define SPEED_NORMAL 220
-#define SPEED_SLOW 180
+#define SPEED_SLOW 170  //180
+#define SPEED_SLOW_TURN 200
+#define DISTANCE_SPEED_SLOW 20 //cm  //15
+//braking distance in cm
+#define BRAKING_DISTANCE 5
 
 
 //SERVO

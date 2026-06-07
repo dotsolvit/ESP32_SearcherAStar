@@ -341,7 +341,20 @@ void cycleDrive(void){
         //Distance covered counters:
         distancePulseCounterLeft = 0;
         distancePulseCounterRight = 0; 
+
+        //Test turn -45 fyd +45 degrees:
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        TankRorateOnAngle(-45);
+        currentAngle=getAngleX();
+        displayAngle( currentAngle );
+
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        TankRorateOnAngle(45);
+        currentAngle=getAngleX();
+        displayAngle( currentAngle );
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
  
+        /*
         //Pilot initialization
         if(pilotInit() == 0) {
 
@@ -368,6 +381,7 @@ void cycleDrive(void){
                 Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
             }
         }
+        */
 
         scannerAngle = 0; //Set scanner angle to 0  
         setServo(scannerAngle);

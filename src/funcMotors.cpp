@@ -88,12 +88,12 @@ void TankRorateOnAngle(int new_angle){
         //
         if( abs(diff) <= 10 ) break;
         if( diff > 0){
-          TankRotateRight(40); //50
+          TankRotateRight(40, SPEED_NORMAL); //50
         }
         else{    
           if(differenceInAngles(new_angle,cur_angle,onRight) >= -10) break;
           Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(50)");
-          TankRotateLeft(40);  //50
+          TankRotateLeft(40, SPEED_NORMAL);  //50
         }
     }
   }
@@ -105,30 +105,30 @@ void TankRorateOnAngle(int new_angle){
       //
       if( abs(diff) <= 1 ) break;
       if( diff > 0){
-        TankRotateRight(20);   //25  //30
+        TankRotateRight(20, SPEED_SLOW_TURN);   //20 //25  //30
       }
       else{
         Serial.print("diff=");Serial.print(diff);Serial.println(" TankRotateLeft(20)");
-        TankRotateLeft(20);   //25   //30   
+        TankRotateLeft(20, SPEED_SLOW_TURN);   //20 //25   //30   
       }
   }
   return ;
 }
 
-void TankRotateLeft(int pause){
+void TankRotateLeft(int pause, int speed){
   ledcWrite(MOTOR_L_A_Channel, 0);
-  ledcWrite(MOTOR_L_B_Channel, SPEED_NORMAL);
-  ledcWrite(MOTOR_R_A_Channel, SPEED_NORMAL);
+  ledcWrite(MOTOR_L_B_Channel, speed);
+  ledcWrite(MOTOR_R_A_Channel, speed);
   ledcWrite(MOTOR_R_B_Channel, 0);
   vTaskDelay(pause / portTICK_PERIOD_MS); // delay(pause);
   TankStop();
 }
 
-void TankRotateRight(int pause){
-  ledcWrite(MOTOR_L_A_Channel, SPEED_NORMAL);
+void TankRotateRight(int pause, int speed){
+  ledcWrite(MOTOR_L_A_Channel, speed);
   ledcWrite(MOTOR_L_B_Channel, 0);
   ledcWrite(MOTOR_R_A_Channel, 0);
-  ledcWrite(MOTOR_R_B_Channel, SPEED_NORMAL);
+  ledcWrite(MOTOR_R_B_Channel, speed);
   vTaskDelay(pause / portTICK_PERIOD_MS); // delay(pause);
   TankStop();
 }

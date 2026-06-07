@@ -15,8 +15,8 @@ void TankStop(void);
 //Turn the tank to a new course angle
 void TankRorateOnAngle(int new_angle);
 
-void TankRotateLeft(int pause);
-void TankRotateRight(int pause);
+void TankRotateLeft(int pause, int speed);
+void TankRotateRight(int pause, int speed);
 
 //SERVO
 //Servo intialization

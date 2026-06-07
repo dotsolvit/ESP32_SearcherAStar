@@ -71,7 +71,7 @@ int pilotForward(void) {
     int distanceToTheNextPoint = distanceBetweenPoints(realCoordsCurrent, pathSet[pathIndexForGo-1]); // Distance to the next point in cm
     currentDistanceCovered = odometer();
 
-    if(currentDistanceCovered >= distanceToTheNextPoint) return 0;
+    if(currentDistanceCovered >= distanceToTheNextPoint - BRAKING_DISTANCE) return 0;
     else if(currentDistanceCovered < DISTANCE_SPEED_SLOW or currentDistanceCovered > distanceToTheNextPoint -DISTANCE_SPEED_SLOW){
         if(pilotCurrentSpeed != SPEED_SLOW) {
             pilotCurrentSpeed = SPEED_SLOW;
@@ -95,7 +95,7 @@ int pilotStop(void) {
     String message;
     int distanceToTheNextPoint = distanceBetweenPoints(realCoordsCurrent, pathSet[pathIndexForGo-1]); // Distance to the next point in cm
     currentDistanceCovered = odometer(); 
-    if(currentDistanceCovered >= distanceToTheNextPoint) {
+    if(currentDistanceCovered >= distanceToTheNextPoint - BRAKING_DISTANCE) {
         TankStop();
         pilotCurrentSpeed = 0;
         Serial.println("Stop");
