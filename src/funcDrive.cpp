@@ -36,9 +36,6 @@ extern int distancePulseCounterRight;
 //pathIndexForGo
 int pathIndexForGo;
 
-//Current tank speed
-int currentTankSpeed;
-
 //STAGES:
 #define STAGE_WAITE 0
 #define STAGE_FINDPATH 1
@@ -63,7 +60,7 @@ int scannerAngle;
 #define MOVEMENT_FORWARD 3
 #define MOVEMENT_STOP 4
 #define MOVEMENT_STOP_SCANNER 5
-#define MOVEMENT_END_SCANNER 6
+//#define MOVEMENT_END_SCANNER 6
 
 byte movementStage;
 
@@ -78,7 +75,7 @@ int currentDistanceCovered, finishedDistanceCovered;
 void initRealCoords() {
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
       realCoordsCurrent={175, 135}; //Текущие   175, 135
-      realCoordsGoal={175, 235};   //Цель
+      realCoordsGoal={280, 230};   //Цель
       xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
     else {
@@ -251,19 +248,22 @@ void cycleDrive(void){
             displayMessage(2, "MOVEMENT_WAIT", 0, "");
             if (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
                 Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+                displayMessage(3, "Failed mutex!", 0, "");
                 stage = STAGE_WAITE; //Stage Waiting control stage
+                movementStage = MOVEMENT_WAIT;
                 return;
             }
             //Distance covered counters:
-            distancePulseCounterLeft = 0;
-            distancePulseCounterRight = 0;  
-            currentTankSpeed = 0; //Current tank speed is zero at the start of movement       
+            //distancePulseCounterLeft = 0;
+            //distancePulseCounterRight = 0;  
+            //currentTankSpeed = 0; //Current tank speed is zero at the start of movement       
             movementStage = MOVEMENT_INIT;
         }
         if(movementStage == MOVEMENT_INIT){
             displayMessage(2, "MOVEMENT_INIT", 0, "");
             if(pilotInit() != 0) { //If pilot initialization is unsuccessful
                 Serial.println("Pilot initialization is unsuccessful!");
+                displayMessage(3, "Failed pilot init!", 0, "");
                 stage = STAGE_WAITE; //Stage Waiting control stage
                 movementStage = MOVEMENT_WAIT; //
                 xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
@@ -276,49 +276,55 @@ void cycleDrive(void){
         if(movementStage == MOVEMENT_TURN){
             displayMessage(2, "MOVEMENT_TURN", 0, "");
             pilotTurn(); //Turn to the current point of the path
-            currentTankSpeed = 0; //Current tank speed is zero at the start of movement
             movementStage = MOVEMENT_FORWARD;
+            //Distance covered counters:
+            distancePulseCounterLeft = 0;
+            distancePulseCounterRight = 0;  
             displayMessage(2, "MOVEMENT_FORWARD", 0, "");
         }
-        if(movementStage == MOVEMENT_FORWARD){
-            /*
-            if(pilotScanner != 0) { //If the scanner detects a new obstacle
+        if(movementStage == MOVEMENT_FORWARD){          
+            if(pilotNarrowScanner() == 1) { //If the scanner detects a new obstacle
                 Serial.println("The scanner detects a new obstacle!");
-                pilotStop();
+                pilotStopScanner();
                 TankBuz(SIGNAL_OBSTACLE);
+                currentAngle = getAngleX();
+                currentDistanceCovered = odometer();
+                //New current coordinates Calc Real current Coordinates:
+                realCoordsCurrent=calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered);
                 movementStage = MOVEMENT_STOP_SCANNER; //
+                initCircularScanner(); //Init circular scanner
             }
             else { 
-                //Go to the next point of the path
-                if(pilotForward() != 0) {
-                    Serial.println("Stop!");
-                    pilotStop();
+                pilotForward(); //Go forward
+                if(pilotStop() == 1) { //We reached the next point on the route
+                    currentAngle = getAngleX();
+                    //New current coordinates Calc Real current Coordinates:
+                    realCoordsCurrent=calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered);
+                    //Decreasing the path index
+                    pathIndexForGo --;
+                    
                     //If we have reached the final point of the journey
                     if(pathIndexForGo == 0){
-                    TankBuz(SIGNAL_GO);
-                    xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
-                    stage = STAGE_WAITE;
-                    Serial.println("It is Goal Point!");
-
-                    //Для контроля высылаем на сайт координаты - текущие и целевые
-                    //sendToWebsiteRealCoords();
-                    return;
+                        TankBuz(SIGNAL_GO);
+                        xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                        stage = STAGE_WAITE;
+                        movementStage = MOVEMENT_WAIT; //
+                        Serial.println("It is Goal Point!");
+                        return;
                     }
                     movementStage = MOVEMENT_TURN; //
                 }
             }
-            */
         }
         if(movementStage == MOVEMENT_STOP_SCANNER){
             displayMessage(2, "STOP_SCANNER", 0, "");
-            pilotStopScanner();
-            xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
-            stage = STAGE_WAITE; //Stage Waiting control stage
-            //Для контроля высылаем на сайт координаты - текущие и целевые
-            //sendToWebsiteRealCoords();
-            return;
+            //The circular scanner for detect new obstacles
+            if(pilotScannerCircular() == 1) {
+                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                stage = STAGE_WAITE; //Stage Waiting control stage
+                movementStage = MOVEMENT_WAIT; //
+            }
         }
-        
     }
 
     //WRM Stage STAGE_RUN *******************************************
@@ -342,6 +348,16 @@ void cycleDrive(void){
         distancePulseCounterLeft = 0;
         distancePulseCounterRight = 0; 
 
+        //Tast pilotCircularScanner:
+        initCircularScanner(); //Init circular scanner
+        for(int i=0; i<1100; i++) {
+            if(pilotScannerCircular() == 1) { //If the scanner detects a new obstacle
+                break;
+            }
+            vTaskDelay(5 / portTICK_PERIOD_MS); // delay 5 ms
+        }
+
+        /*
         //Test turn -45 fyd +45 degrees:
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         TankRorateOnAngle(-45);
@@ -353,6 +369,7 @@ void cycleDrive(void){
         currentAngle=getAngleX();
         displayAngle( currentAngle );
         vTaskDelay(3000 / portTICK_PERIOD_MS);
+        */
  
         /*
         //Pilot initialization

@@ -55,14 +55,18 @@ int pilotInit() {
 
 //Turn to the current point of the path
 void pilotTurn() {
+    String message;
     int new_angle=calcAngleToNewPointPath(realCoordsCurrent, pathSet[pathIndexForGo-1]); //Calculating the angle to a new waypoint
     currentAngle = getAngleX();
     if(currentAngle != new_angle){
         Serial.print("Rotate from ");Serial.print(currentAngle); Serial.print(" to "); Serial.println(new_angle);
         TankRorateOnAngle(new_angle);
         currentAngle = getAngleX();
+        message = "Turn to: " + String(new_angle) + " grad.";
+        addToJournal(message.c_str()); // Add message to journal
     }
     else Serial.println("The angle is the same");
+    pilotCurrentSpeed = 0;
 }
 
 //Pilot forward
@@ -107,12 +111,14 @@ int pilotStop(void) {
             int realDistanceCovered = odometer();
             if(realDistanceCovered == currentDistanceCovered) {
                 Serial.print("realDistanceCovered = "); Serial.print(realDistanceCovered); Serial.print(" distanceToTheNextPoint = "); Serial.println(distanceToTheNextPoint);
-                message = "Full stop. Real distance covered: " + String(realDistanceCovered) + " cm.";
+                message = "Full stop: " + String(realDistanceCovered) + " cm. To Next: " + String(distanceToTheNextPoint) + " cm.";
                 addToJournal(message.c_str()); // Add message to journal
-                return 1; // Stop successful
+                return 1; // Stop
             }
             else currentDistanceCovered = realDistanceCovered; // Update the distance covered if the robot is still moving
         }
+        currentDistanceCovered = odometer();
+        return 1; //Stop
     }
     return 0; // Not Stop 
 }
@@ -179,6 +185,7 @@ int pilotNarrowScanner(void) {
 
 //The circular scanner initiation 
 void initCircularScanner() {
+    addToJournal("init Circular Scanner"); // Add message to journ
     circularScannerActive = true;
 }
 
@@ -220,8 +227,27 @@ int pilotScannerCircular(void) {
 
 //Wide scan after stopping due to an obstacle
 void pilotStopScanner(void) {
-  //....
-  
+    String message;
+    currentDistanceCovered = odometer(); 
+    TankStop();
+    pilotCurrentSpeed = 0;
+    Serial.println("Stopping at an obstacle");
+    message = "Stopping at an obstacle: " + String(currentDistanceCovered) + " cm.";
+    addToJournal(message.c_str()); // Add message to journal
+    //full stop:
+    for(int i=0; i<20; i++) {
+        vTaskDelay(50 / portTICK_PERIOD_MS); // delay 50 мс
+        int realDistanceCovered = odometer();
+        if(realDistanceCovered == currentDistanceCovered) {
+            Serial.print("realDistanceCovered = "); Serial.print(realDistanceCovered);
+            message = "Full stop. Real distance covered: " + String(realDistanceCovered) + " cm.";
+            addToJournal(message.c_str()); // Add message to journal
+            return; 
+        }
+        else currentDistanceCovered = realDistanceCovered; // Update the distance covered if the robot is still moving
+    } 
+    currentDistanceCovered = odometer();
+    return; 
 }
 
 //Journal:
