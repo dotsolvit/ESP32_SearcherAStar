@@ -57,6 +57,8 @@ void IRAM_ATTR handlePulseRight() {
 void driveTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
   (void) pvParameters;                  // ігноруємо вхідні параметри
   
+  //Init EEPROM:
+  initEEPROM() ;
   //Servo intialization
   initServo();
   //Sonic initialization

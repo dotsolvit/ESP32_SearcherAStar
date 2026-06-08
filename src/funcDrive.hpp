@@ -1,5 +1,8 @@
 //funcDrive.hpp
 
+//Init EEPROM:
+void initEEPROM() ;
+
 //Init Real Coordinates:
 void initRealCoords();
 

@@ -100,6 +100,9 @@ void Web_starting(){
   server.on("/sendgo", handle_sendgo); //Actions when pressing send go
   server.on("/sendrun", handle_sendrun); //Actions when pressing send run
   server.on("/sendtest", handle_sendtest); //Actions when pressing send test
+  server.on("/loadobstacles", handle_loadobstacles); //Actions when pressing load obstacles
+  server.on("/saveobstacles", handle_saveobstacles); //Actions when pressing save obstacles
+  server.on("/clearobstacles", handle_clearobstacles); //Actions when pressing clear obstacles
   server.on("/seemap", handle_seemap); //Actions when pressing see map
   server.on("/seejurnal", handle_seejurnal); //Actions when pressing see journal
   server.on("/seemapup", handle_seemapup);  //Actions when pressing See Map Up 10
@@ -186,6 +189,30 @@ void handle_sendtest(void) {
   server.sendHeader("Location", "/"); //Redirect to the main page
   server.send(303);
 }
+//Actions when pressing load obstacles
+void handle_loadobstacles(void) {
+  Serial.println("L"); //Send Load Obstacles command to Serial
+  byte sendedByteW = 'L'; //Set Load Obstacles command to sendedByte
+  xQueueSend(toDriveQueue, &sendedByteW, 0); //Send Load Obstacles command to toDriveQueue
+  server.sendHeader("Location", "/"); //Redirect to the main page
+  server.send(303);
+}
+//Actions when pressing save obstacles
+void handle_saveobstacles(void) {
+  Serial.println("S"); //Send Save Obstacles command to Serial
+  byte sendedByteW = 'S'; //Set Save Obstacles command to sendedByte
+  xQueueSend(toDriveQueue, &sendedByteW, 0); //Send Save Obstacles command to toDriveQueue
+  server.sendHeader("Location", "/"); //Redirect to the main page
+  server.send(303);
+}
+//Actions when pressing clear obstacles
+void handle_clearobstacles(void) {
+  Serial.println("C"); //Send Clear Obstacles command to Serial
+  byte sendedByteW = 'C'; //Set Clear Obstacles command to sendedByte
+  xQueueSend(toDriveQueue, &sendedByteW, 0); //Send Clear Obstacles command to toDriveQueue
+  server.sendHeader("Location", "/"); //Redirect to the main page
+  server.send(303);
+}
 
 //Actions when pressing see journal
 void handle_seejurnal(void) {
@@ -266,6 +293,12 @@ String SendHTML(void) {
           <button onclick="location.href='/sendgo'">Send Go</button>
           <button onclick="location.href='/sendrun'">Send Run</button>
           <button onclick="location.href='/sendtest'">Send Test</button>
+          <br>
+          Obstacles:
+          <button onclick="location.href='/loadobstacles'">Load</button>
+          <button onclick="location.href='/saveobstacles'">Save</button>
+          <button onclick="location.href='/clearobstacles'">Clear</button>
+          <br>
           <br>
           <button onclick="location.href='/seemap'">See Map</button>
           <button onclick="location.href='/seejurnal'">See Journal</button>

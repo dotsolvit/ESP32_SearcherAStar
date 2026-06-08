@@ -1,6 +1,7 @@
 //funcDrive.cpp
 
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "config.hpp"
 #include "funcDrive.hpp"
 #include "funcArray.hpp"
@@ -42,6 +43,9 @@ int pathIndexForGo;
 #define STAGE_GO 2
 #define STAGE_RUN 3 //STAGE_FINDPATH + STAGE_GO
 #define STAGE_TEST 4
+#define STAGE_LOADOBSTACLES 5
+#define STAGE_SAVEOBSTACLES 6
+#define STAGE_CLEAROBSTACLES 7
 
 //Stage
 byte stage, displayed_stage;
@@ -60,7 +64,7 @@ int scannerAngle;
 #define MOVEMENT_FORWARD 3
 #define MOVEMENT_STOP 4
 #define MOVEMENT_STOP_SCANNER 5
-//#define MOVEMENT_END_SCANNER 6
+
 
 byte movementStage;
 
@@ -70,6 +74,12 @@ byte sendedByte, receivedByte;
 
 //Distance covered:
 int currentDistanceCovered, finishedDistanceCovered;
+
+//Init EEPROM:
+void initEEPROM() {
+    EEPROM.begin(sizeof(obstacleSet)+1); // Initialize EEPROM with size equal to the size of obstacleSet plus 1 byte
+    Serial.println("EEPROM initialized with size: " + String(sizeof(obstacleSet)+1)); // Print the initialized size for verification
+}
 
 //Init Real Coordinates:
 void initRealCoords() {
@@ -159,7 +169,16 @@ void cycleDrive(void){
             Serial.println("RUN");
         } else if(stage == STAGE_TEST) {
             displayMessage(1, "Stage: TEST", 0, "");
-            Serial.println("TEST");    
+            Serial.println("TEST");   
+        } else if(stage == STAGE_LOADOBSTACLES) { 
+            displayMessage(1, "Stage: LOADOBSTACLES", 0, "");
+            Serial.println("LOADOBSTACLES");
+        } else if(stage == STAGE_SAVEOBSTACLES) {
+            displayMessage(1, "Stage: SAVEOBSTACLES", 0, "");
+            Serial.println("SAVEOBSTACLES");
+        } else if(stage == STAGE_CLEAROBSTACLES) {
+            displayMessage(1, "Stage: CLEAROBSTACLES", 0, "");
+            Serial.println("CLEAROBSTACLES");
         } else {
             displayMessage(1, "Stage: UNKNOWN", 0, "");
             Serial.println("UNKNOWN");
@@ -210,8 +229,20 @@ void cycleDrive(void){
                 stage = STAGE_TEST;
                 return; 
             }
+            else if(receivedByte == 'L') { //If get "Load Obstacles" command
+                stage = STAGE_LOADOBSTACLES;
+                return; 
+            }
+            else if(receivedByte == 'S') { //If get "Save Obstacles" command
+                stage = STAGE_SAVEOBSTACLES;
+                return; 
+            }
+            else if(receivedByte == 'C') { //If get "Clear Obstacles" command
+                stage = STAGE_CLEAROBSTACLES;
+                return; 
+            }
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс для зменшення навантаження (poll every 100ms)
+        vTaskDelay(100 / portTICK_PERIOD_MS); // 100 ms delay to reduce load
     }
 
     //Stage STAGE_FINDPATH *******************************************
@@ -405,6 +436,40 @@ void cycleDrive(void){
         //Here should be the code for testing the robot
         stage = STAGE_WAITE;
         return;
-    }   
+    }  
+    
+    //EEPROM
+    //Stage STAGE_LOADOBSTACLES
+    if(stage == STAGE_LOADOBSTACLES){
+        Serial.println("Load Obstacles from EEPROM");
+        //Загрузить матрицу если она есть:
+        if(EEPROM.read(0) != 0){
+            obstacleSetPar.setSize = int(EEPROM.read(0));
+            EEPROM.get(1, obstacleSet);
+            Serial.println("Obstacle loaded");
+        }
+        else{
+            Serial.println("EEPROM is empty!");
+        }
+        stage = STAGE_WAITE; //Stage Waiting control stage
+    }
+    //Stage STAGE_SAVEOBSTACLES
+    if(stage == STAGE_SAVEOBSTACLES){
+        Serial.println("SAVE Obstacles to EEPROM");
+        uint8_t size=obstacleSetPar.setSize;
+        EEPROM.put(0, size);
+        EEPROM.put(1, obstacleSet);
+        EEPROM.commit();
+        Serial.println("Obstacle saved to EEPROM");
+        stage = STAGE_WAITE; //Stage Waiting control stage
+    }
+    //Stage STAGE_CLEAROBSTACLES
+    if(stage == STAGE_CLEAROBSTACLES){
+        //Очистить одномерную матрицу координат
+        ClearCoords(obstacleSet, obstacleSetPar);
+        Serial.println("Set Obstacles cleared");
+        stage = STAGE_WAITE; //Stage Waiting control stage
+    }
+    //
 
 }

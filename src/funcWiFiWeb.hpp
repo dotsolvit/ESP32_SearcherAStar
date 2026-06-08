@@ -23,6 +23,13 @@ void handle_sendrun(void);
 //Actions when pressing send test
 void handle_sendtest(void);
 
+//Actions when pressing load obstacles
+void handle_loadobstacles(void);
+//Actions when pressing save obstacles
+void handle_saveobstacles(void);
+//Actions when pressing clear obstacles
+void handle_clearobstacles(void);
+
 //Actions when pressing see journal
 void handle_seejurnal(void);
 
