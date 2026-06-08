@@ -43,7 +43,7 @@ int goal_y, goal_x;
 //For Table:
 //number of lines displayed
 #define MAX_NUBMER_OF_LINES SIZE_MAP_Y
-#define NUMBER_OF_ROWS_IN_THE_TABLE 20
+#define NUMBER_OF_ROWS_IN_THE_TABLE 30
 #define SHIFTING_ROWS_IN_THE_TABLE 10
 //Top linr number for map obstacle and path visualization
 int top_line_number=MAX_NUBMER_OF_LINES-1;
@@ -334,6 +334,7 @@ String SendSeeMapHTML(String mess) {
             margin-right: auto;
           }
           td{
+            width: 20px;
             border: 1px solid grey;
             text-align:center;
           }  
@@ -381,7 +382,7 @@ String mapObstacleAndPath(int top_line_number){
           else web_m +="B";
         } 
         else if(indexFindPointCoords(obstacleSet, obstacleSetPar.setSize, c) !=-1) web_m +="X";
-        else web_m +="...";
+        else web_m +=""; //"...";
         web_m += "</td>";
       }
       web_m +="</tr>";
