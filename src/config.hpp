@@ -45,6 +45,8 @@
 #define STEP_COST 50
 #define TURN_COST 1
 #define STEP_GRID 10 //шаг сетки карты 10см
+#define DIAGONAL_STEP_GRID 14 //шаг сетки по диагонали (10 * sqrt(2))
+
 //Размер карты 55*35
 #define SIZE_MAP_Y 55  //55
 #define SIZE_MAP_X 35  //35
@@ -116,7 +118,7 @@
 #define SIGNAL_OBSTACLE 2
 
 //Jurnal:
-#define JOURNAL_SIZE 50 //Максимум записей в журнале (Maximum number of entries in the journal)
+#define JOURNAL_SIZE 100 //Максимум записей в журнале (Maximum number of entries in the journal)
 #define JOURNAL_MESSAGE_LENGTH 50 //Максимальная длина сообщения в журнале (Maximum length of a message in the journal)
 
 //Структура координат сітки
