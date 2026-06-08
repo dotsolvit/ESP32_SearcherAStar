@@ -19,6 +19,9 @@ extern Par pathSetPar;
 //Obstacle array (in main.cpp):
 extern Coord obstacleSet[MAX_OBSTACLE_LENGH];
 extern Par obstacleSetPar;
+//Route array (in main.cpp):
+extern Coord routeSet[MAX_ROUTE_LENGH];
+extern Par routeSetPar;
 
 //Real Coordinates (in main.cpp):
 extern realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
@@ -132,6 +135,21 @@ int initializationObstacleSet(){
     } 
     else {
         Serial.println("Failed to take mutex in initializationObstacleSet!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+        return -1; // Повертаємо -1 у випадку помилки (Return -1 on error)
+    }  
+    return 0; // Повертаємо 0 при успішному завершенні (Return 0 on success) 
+}
+
+//Initialization Route Set:
+int initializationRouteSet(){
+    Serial.println("initializationRouteSet() called"); // Виводимо повідомлення про виклик функції (Print message about function call)
+    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
+        //Clear Route Set:
+        ClearCoords(routeSet, routeSetPar);
+        xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+    } 
+    else {
+        Serial.println("Failed to take mutex in initializationRouteSet!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
         return -1; // Повертаємо -1 у випадку помилки (Return -1 on error)
     }  
     return 0; // Повертаємо 0 при успішному завершенні (Return 0 on success) 
@@ -284,10 +302,6 @@ void cycleDrive(void){
                 movementStage = MOVEMENT_WAIT;
                 return;
             }
-            //Distance covered counters:
-            //distancePulseCounterLeft = 0;
-            //distancePulseCounterRight = 0;  
-            //currentTankSpeed = 0; //Current tank speed is zero at the start of movement       
             movementStage = MOVEMENT_INIT;
         }
         if(movementStage == MOVEMENT_INIT){
@@ -302,10 +316,16 @@ void cycleDrive(void){
             }
             TankBuz(SIGNAL_GO);
             Serial.println("Start moving to the goal");
+            //Set the first point of the route
+            addPointToRoute(realCoordsCurrent);
+            //
             movementStage = MOVEMENT_TURN;
         }
         if(movementStage == MOVEMENT_TURN){
             displayMessage(2, "MOVEMENT_TURN", 0, "");
+            //Fix the turning point of the route
+            addPointToRoute(realCoordsCurrent);
+            //
             pilotTurn(); //Turn to the current point of the path
             movementStage = MOVEMENT_FORWARD;
             //Distance covered counters:
@@ -322,10 +342,15 @@ void cycleDrive(void){
                 currentDistanceCovered = odometer();
                 //New current coordinates Calc Real current Coordinates:
                 realCoordsCurrent=calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered);
+                //Fix the turning point of the route
+                addPointToRoute(realCoordsCurrent);
+                //
                 movementStage = MOVEMENT_STOP_SCANNER; //
                 initCircularScanner(); //Init circular scanner
             }
             else { 
+                //Add a point to the route in movement
+                addPointToRouteInMovement(realCoordsCurrent, currentAngle, odometer());
                 pilotForward(); //Go forward
                 if(pilotStop() == 1) { //We reached the next point on the route
                     currentAngle = getAngleX();
@@ -333,6 +358,9 @@ void cycleDrive(void){
                     realCoordsCurrent=calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered);
                     //Decreasing the path index
                     pathIndexForGo --;
+                    //Fix the turning point of the route
+                    addPointToRoute(realCoordsCurrent);
+                    //
                     
                     //If we have reached the final point of the journey
                     if(pathIndexForGo == 0){

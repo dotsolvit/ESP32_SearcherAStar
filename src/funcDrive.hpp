@@ -9,6 +9,9 @@ void initRealCoords();
 //Init Obstacle Set:
 int initializationObstacleSet();
 
+//Initialization Route Set:
+int initializationRouteSet();
+
 //Init Stage:
 void initStage();
 

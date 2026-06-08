@@ -27,3 +27,9 @@ int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scanne
 
 //Processing measurement data to find obstacles.
 int seekObstacle(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered, int scannerOffset, int scannerAngle, int distanceM);
+
+//Add a point to the route
+void addPointToRoute(realCoord realCoordsCurrent);
+
+//Add a point to the route in movement
+void addPointToRouteInMovement(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered);

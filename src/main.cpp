@@ -22,6 +22,10 @@ volatile Par pathSetPar = {0, 0, MAX_PATH_LENGH};
 volatile Coord obstacleSet[MAX_OBSTACLE_LENGH];
 volatile Par obstacleSetPar = {0, 0, MAX_OBSTACLE_LENGH};
 
+//Створюємо масив маршруту (Create a route array)
+volatile Coord routeSet[MAX_ROUTE_LENGH];
+volatile Par routeSetPar = {0, 0, MAX_ROUTE_LENGH};
+
 //Real Coordinates
 volatile realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
 
@@ -70,6 +74,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
 
   initRealCoords(); //Init Real Coordinates
   initializationObstacleSet();  //Init Obstacle Set
+  initializationRouteSet(); //Init Route Set
   initStage(); //Init Stage
   
   displayMessage(1, "Waiting 10 seconds..", 0, "");

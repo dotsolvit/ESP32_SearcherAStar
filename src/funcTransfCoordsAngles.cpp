@@ -9,6 +9,9 @@
 //Obstacle array (in main.cpp):
 extern Coord obstacleSet[MAX_OBSTACLE_LENGH];
 extern Par obstacleSetPar;
+//Route array (in main.cpp):
+extern Coord routeSet[MAX_ROUTE_LENGH];
+extern Par routeSetPar;
 
 //Перетворити реальні координати на координати сітки(Transform real coordinates to grid coordinates)
 Coord TransformRealToGridCoords(realCoord &coord_in ){
@@ -113,4 +116,26 @@ int seekObstacle(realCoord realCoordsCurrent, int currentAngle, int currentDista
     return 1; //New obstacle detected
   }
   return 0;
+}
+
+//Add a point to the route
+void addPointToRoute(realCoord realCoordsCurrent) {
+  //Transform real coordinates to grid coordinates
+  Coord routeCoords = TransformRealToGridCoords(realCoordsCurrent);
+  if(indexFindPointCoords(routeSet, routeSetPar, routeCoords)==-1) { //If the route point is new
+    int cod_ret=AddCoords(routeSet, routeSetPar, routeCoords);
+  }
+}
+
+//Add a point to the route in movement
+void addPointToRouteInMovement(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered) {
+  static int prevDistanceCovered = 0; // Previous distance covered
+  if (currentDistanceCovered - prevDistanceCovered >= STEP_GRID)
+  {
+    prevDistanceCovered = currentDistanceCovered; // Update previous distance covered
+    //Calculating real coordinates of the current point
+    realCoord newRealCoords = calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered);
+    //Add a point to the route
+    addPointToRoute(newRealCoords);
+  }
 }

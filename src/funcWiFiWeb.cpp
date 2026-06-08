@@ -17,6 +17,9 @@ extern Par pathSetPar;
 //Obstacle array (in main.cpp):
 extern Coord obstacleSet[MAX_OBSTACLE_LENGH];
 extern Par obstacleSetPar;
+//Route array (in main.cpp):
+extern Coord routeSet[MAX_ROUTE_LENGH];
+extern Par routeSetPar;
 
 //Real Coordinates
 extern realCoord realCoordsCurrent, realCoordsGoal; 
@@ -381,8 +384,14 @@ String mapObstacleAndPath(int top_line_number){
           else if(index == 0) web_m +="C";
           else web_m +="B";
         } 
-        else if(indexFindPointCoords(obstacleSet, obstacleSetPar.setSize, c) !=-1) web_m +="X";
-        else web_m +=""; //"...";
+        else{
+          int indexRoute=indexFindPointCoords(routeSet, routeSetPar.setSize, c);
+          if(indexRoute !=-1 ){
+            web_m +="+";
+          }
+          else if(indexFindPointCoords(obstacleSet, obstacleSetPar.setSize, c) !=-1) web_m +="X";
+          else web_m +=""; //"...";
+        }
         web_m += "</td>";
       }
       web_m +="</tr>";
