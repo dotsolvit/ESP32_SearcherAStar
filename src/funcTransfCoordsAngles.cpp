@@ -13,6 +13,8 @@ extern Par obstacleSetPar;
 extern Coord routeSet[MAX_ROUTE_LENGH];
 extern Par routeSetPar;
 
+int prevDistanceCoveredRoute = 0; // Previous distance covered
+
 //Перетворити реальні координати на координати сітки(Transform real coordinates to grid coordinates)
 Coord TransformRealToGridCoords(realCoord &coord_in ){
   Coord coord_out;
@@ -118,6 +120,11 @@ int seekObstacle(realCoord realCoordsCurrent, int currentAngle, int currentDista
   return 0;
 }
 
+//Reset previous distance covered for the route
+void resetPreviousDistanceCoveredRoute() {
+  prevDistanceCoveredRoute = 0;
+}
+
 //Add a point to the route
 void addPointToRoute(realCoord realCoordsCurrent) {
   //Transform real coordinates to grid coordinates
@@ -129,13 +136,21 @@ void addPointToRoute(realCoord realCoordsCurrent) {
 
 //Add a point to the route in movement
 void addPointToRouteInMovement(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered) {
-  static int prevDistanceCovered = 0; // Previous distance covered
-  if (currentDistanceCovered - prevDistanceCovered >= STEP_GRID)
+  int step= STEP_GRID;
+  if(isDiagonal(currentAngle)) step=DIAGONAL_STEP_GRID;
+
+  if (currentDistanceCovered - prevDistanceCoveredRoute >= step)
   {
-    prevDistanceCovered = currentDistanceCovered; // Update previous distance covered
+    prevDistanceCoveredRoute = currentDistanceCovered; // Update previous distance covered
     //Calculating real coordinates of the current point
     realCoord newRealCoords = calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered);
     //Add a point to the route
     addPointToRoute(newRealCoords);
   }
+}
+
+//Is the current angle diagonal
+int isDiagonal(int currentAngle) {
+  int normalizedAngle = normalizeAngle(currentAngle);
+  return ((normalizedAngle % 90 >= 40) && (normalizedAngle % 90 <= 50)); // Diagonal if not a multiple of 90 degrees
 }

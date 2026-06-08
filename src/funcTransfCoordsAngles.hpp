@@ -28,8 +28,14 @@ int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scanne
 //Processing measurement data to find obstacles.
 int seekObstacle(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered, int scannerOffset, int scannerAngle, int distanceM);
 
+//Reset previous distance covered for the route
+void resetPreviousDistanceCoveredRoute();
+
 //Add a point to the route
 void addPointToRoute(realCoord realCoordsCurrent);
 
 //Add a point to the route in movement
 void addPointToRouteInMovement(realCoord realCoordsCurrent, int currentAngle, int currentDistanceCovered);
+
+//Is the current angle diagonal 
+int isDiagonal(int currentAngle);

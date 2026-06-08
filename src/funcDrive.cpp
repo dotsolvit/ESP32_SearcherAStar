@@ -325,6 +325,7 @@ void cycleDrive(void){
             displayMessage(2, "MOVEMENT_TURN", 0, "");
             //Fix the turning point of the route
             addPointToRoute(realCoordsCurrent);
+            resetPreviousDistanceCoveredRoute(); //Reset previous distance covered for the route
             //
             pilotTurn(); //Turn to the current point of the path
             movementStage = MOVEMENT_FORWARD;
