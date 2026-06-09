@@ -60,7 +60,7 @@ extern int currentAngle, displayed_currentAngle; //Текущий угол по 
 //Scanner angle:    
 int scannerAngle;
 
-//Movement stage:
+//Movement (GO and RUN)stage:
 #define MOVEMENT_WAIT 0
 #define MOVEMENT_INIT 1
 #define MOVEMENT_TURN 2
@@ -68,15 +68,19 @@ int scannerAngle;
 #define MOVEMENT_STOP 4
 #define MOVEMENT_STOP_SCANNER 5
 
+//RUN stage
+#define RUN_FINDPATH 0
+#define RUN_GO 1
 
 byte movementStage;
+byte runStage;
 
 
 // змінні для обміну даними між задачами (variables for data exchange between tasks)
 byte sendedByte, receivedByte; 
 
 //Distance covered:
-int currentDistanceCovered, finishedDistanceCovered;
+int currentDistanceCovered; 
 
 //Init EEPROM:
 void initEEPROM() {
@@ -87,8 +91,8 @@ void initEEPROM() {
 //Init Real Coordinates:
 void initRealCoords() {
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-      realCoordsCurrent={175, 135}; //Текущие   175, 135
-      realCoordsGoal={280, 230};   //Цель
+      realCoordsCurrent={155, 125}; //Текущие   175, 125
+      realCoordsGoal={155, 295};   //Цель 155, 295
       xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
     else {
@@ -229,10 +233,9 @@ void cycleDrive(void){
                 return;
             }
             else if(receivedByte == 'G') { //If get "GO" command
+                initJournal(); //Init journal for GO stage
                 stage = STAGE_GO;
                 movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
-                //Distance covered:
-                finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
                 return;
             }
             else if(receivedByte == 'F') { //If get "Find Path" command
@@ -240,7 +243,9 @@ void cycleDrive(void){
                 return; 
             }
             else if(receivedByte == 'R') { //If get "Run" command
+                initJournal(); //Init journal for RUN stage
                 stage = STAGE_RUN;
+                runStage = RUN_FINDPATH; // Initial RUN stage - find path
                 return; 
             }
              else if(receivedByte == 'T') { //If get "Test" command
@@ -264,7 +269,8 @@ void cycleDrive(void){
     }
 
     //Stage STAGE_FINDPATH *******************************************
-    if(stage == STAGE_FINDPATH ){
+    if(stage == STAGE_FINDPATH or (stage == STAGE_RUN and runStage == RUN_FINDPATH)) { //If it's Find Path stage or Run stage (if it's Run stage, we will find the path in the beginning of it)
+        String message;
         Serial.println("Start find path:");
         //Cleat path set 
         ClearCoords(pathSet, pathSetPar);
@@ -274,30 +280,40 @@ void cycleDrive(void){
         if( code.return_code != 0) {
             Serial.print(code.return_code);
             Serial.println("Pathfinding is unsuccessful!");
+            displayMessage(3, "No path found!", 0, "");
+            addToJournal("No path found!" );
+            stage = STAGE_WAITE; //Stage Waiting control stage
+            TankBuz(SIGNAL_NOPATH);
+            return;
         }
         else{
             Serial.println("The path has been found");
-
             //Compress Path:
             Serial.println("Compress Path");
             compressPath();
             Serial.println("The path has been compressed");
+            message = "Path found and compressed! Stage: " ;
+            if(stage == STAGE_RUN) message += "STAGE_RUN";
+            else message += "STAGE_FINDPATH";
+            addToJournal(message.c_str());
         }
 
         if(stage == STAGE_RUN) {
-            //stage = STAGE_GO;
-            //finishedDistanceCovered = 0; //Finish distance covered - it's zero at the start of path execution
+            runStage = RUN_GO; // Move to RUN stage - go!
+            movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
+            addToJournal("Stage RUN, RUN_GO, MOVEMENT_WAIT" );
         }
         else stage = STAGE_WAITE; //Stage Waiting control stage
     }
 
     //Stage STAGE_GO *******************************************
-    if(stage == STAGE_GO){
+    if(stage == STAGE_GO or (stage == STAGE_RUN and runStage == RUN_GO)) { //If it's GO stage or Run stage 
         if(movementStage == MOVEMENT_WAIT){
             displayMessage(2, "MOVEMENT_WAIT", 0, "");
             if (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
                 Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
                 displayMessage(3, "Failed mutex!", 0, "");
+                addToJournal("Failed to take mutex in GO stage!" );
                 stage = STAGE_WAITE; //Stage Waiting control stage
                 movementStage = MOVEMENT_WAIT;
                 return;
@@ -309,6 +325,7 @@ void cycleDrive(void){
             if(pilotInit() != 0) { //If pilot initialization is unsuccessful
                 Serial.println("Pilot initialization is unsuccessful!");
                 displayMessage(3, "Failed pilot init!", 0, "");
+                addToJournal("Failed pilot init!" );
                 stage = STAGE_WAITE; //Stage Waiting control stage
                 movementStage = MOVEMENT_WAIT; //
                 xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
@@ -380,22 +397,19 @@ void cycleDrive(void){
             displayMessage(2, "STOP_SCANNER", 0, "");
             //The circular scanner for detect new obstacles
             if(pilotScannerCircular() == 1) {
+                addToJournal("End of circular scanning" );
                 xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
-                stage = STAGE_WAITE; //Stage Waiting control stage
+                if(stage == STAGE_GO) {
+                    stage = STAGE_WAITE; //Stage Waiting control stage
+                    addToJournal("Stage WAIT" );
+                }
+                else if(stage == STAGE_RUN) {
+                    runStage = RUN_FINDPATH; // Move to RUN stage - find path!
+                    addToJournal("Stage RUN, RUN_FINDPATH, MOVEMENT_WAIT" );
+                }
                 movementStage = MOVEMENT_WAIT; //
             }
         }
-    }
-
-    //WRM Stage STAGE_RUN *******************************************
-    if(stage == STAGE_RUN) {
-        for(int i=-SERVO_MAX_ANGLE; i<= SERVO_MAX_ANGLE; i+=45){ //Test servo
-            setServo(i);
-            delay(800);     
-        }
-
-        stage = STAGE_WAITE;
-        return;
     }
 
     //WRM Stage STAGE_TEST *******************************************

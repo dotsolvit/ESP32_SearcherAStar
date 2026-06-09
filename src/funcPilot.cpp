@@ -25,8 +25,7 @@ extern int pathIndexForGo;
 extern int currentAngle, displayed_currentAngle; //Текущий угол по Х
 
 //Distance covered:
-extern int currentDistanceCovered, finishedDistanceCovered;
-
+extern int currentDistanceCovered; 
 
 //Scanner angle:    
 extern int scannerAngle;
@@ -45,6 +44,7 @@ extern unsigned long journalInitTime;
 int pilotInit() {
     if(pathSetPar.setSize==0 or pathSetPar.setSize==1){
         Serial.println("The Path is empty. No GO!");
+        addToJournal("The Path is empty. No GO!" );
         TankBuz(SIGNAL_NOPATH);
         return -1; // Return an error code
     }
@@ -210,8 +210,8 @@ int pilotScannerCircular(void) {
         vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
         distance2 = IR_Distance();
         int distanceM= medianFilter(distance0, distance1, distance2); // Apply median filter to the three measurements
-        String message = " 0=" + String(distance0) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
-        addToJournal(message.c_str()); // Add message to journal
+        //String message = " 0=" + String(distance0) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
+        //addToJournal(message.c_str()); // Add message to journal
         scannerAngle += SCANNING_ANGLE_STEP; // Move to the next position
         if(scannerAngle <= SERVO_MAX_ANGLE) {
             setServo(scannerAngle);

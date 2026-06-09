@@ -51,11 +51,11 @@
 #define SIZE_MAP_Y 55  //55
 #define SIZE_MAP_X 35  //35
 
-#define MAX_REACHABLE_NODES 100  //Maximum nodes in reachableSet
+#define MAX_REACHABLE_NODES 150  //Maximum nodes in reachableSet //100
 #define MAX_EXPLORED_NODES 300   //Maximum nodes in exploredSet
-#define MAX_PATH_LENGH 100       //Maximum coordinates in pathSet
-#define MAX_OBSTACLE_LENGH 150   //Maximum coordinates in obstacleSet
-#define MAX_ROUTE_LENGH 200      //Maximum coordinates in routeSet
+#define MAX_PATH_LENGH 150       //Maximum coordinates in pathSet //100
+#define MAX_OBSTACLE_LENGH 200   //Maximum coordinates in obstacleSet //150
+#define MAX_ROUTE_LENGH 200      //Maximum coordinates in routeSet //150
 
 #define RESISTOR_RATIO 3.119 // (9.81k + 4.63k) / 4.63k делитель напряжения 
 
