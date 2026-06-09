@@ -164,10 +164,10 @@ void TankBuz(int signal){
       buz_signal={200, 50, 500, 50};
       break;
     case SIGNAL_NOPATH:
-      buz_signal={500, 1000, 100, 10};
+      buz_signal={500, 500, 100, 10};
       break;
     case SIGNAL_OBSTACLE:
-      buz_signal={500, 1000, 500, 1000};
+      buz_signal={500, 500, 500, 500};
       break;     
     default: 
       buz_signal={100, 10, 100, 10}; 
