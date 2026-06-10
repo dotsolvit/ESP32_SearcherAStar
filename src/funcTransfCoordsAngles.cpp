@@ -100,7 +100,7 @@ int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scanne
   Coord obstacleCoords = TransformRealToGridCoords(obstacleRealCoords);
   //We check whether such an obstacle exists in the obstacle array.
   if(indexFindPointCoords(obstacleSet,obstacleSetPar, obstacleCoords)==-1) { //If the obstacle is new
-    int cod_ret=AddCoords(obstacleSet,obstacleSetPar, obstacleCoords);
+    AddCoords(obstacleSet,obstacleSetPar, obstacleCoords);
   }
   return 0;
 }
@@ -130,7 +130,7 @@ void addPointToRoute(realCoord realCoordsCurrent) {
   //Transform real coordinates to grid coordinates
   Coord routeCoords = TransformRealToGridCoords(realCoordsCurrent);
   if(indexFindPointCoords(routeSet, routeSetPar, routeCoords)==-1) { //If the route point is new
-    int cod_ret=AddCoords(routeSet, routeSetPar, routeCoords);
+    AddCoords(routeSet, routeSetPar, routeCoords);
   }
 }
 
