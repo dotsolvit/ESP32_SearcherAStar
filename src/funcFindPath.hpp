@@ -44,3 +44,10 @@ int IsThisNodePossible(Coord &c);
 //ест функції напрямку (Test of the direction function)
 void testDirection();
 
+/*
+//WRM
+//WRM print list of nodes (WRM - print list of nodes)
+void wrmPrintListOfNodes(void);
+//WRM print nodes (WRM - print nodes)
+void wrmPrintNodes(Node *set, Par &setp);
+*/

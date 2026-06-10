@@ -118,8 +118,8 @@
 #define SIGNAL_OBSTACLE 2
 
 //Jurnal:
-#define JOURNAL_SIZE 100 //Максимум записей в журнале (Maximum number of entries in the journal)
-#define JOURNAL_MESSAGE_LENGTH 50 //Максимальная длина сообщения в журнале (Maximum length of a message in the journal)
+#define JOURNAL_SIZE 100 //Maximum number of entries in the journal
+#define JOURNAL_MESSAGE_LENGTH 50 //Maximum length of a message in the journal
 
 //Структура координат сітки
 struct Coord {

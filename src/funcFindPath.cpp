@@ -5,18 +5,18 @@
 #include "funcFindPath.hpp"
 #include "funcArray.hpp"
 
-//Створюємо списки вузлів - reachableSet(досяжні вузли) і exploredSet(Це досліджені вузли)
-Node reachableSet[MAX_REACHABLE_NODES]; // Это список достижимых узлов
+//Creating node lists - reachableSet (reachable nodes) and exploredSet (explored nodes)
+Node reachableSet[MAX_REACHABLE_NODES]; // This is a list of reachable nodes
 Par reachableSetPar = {0, 0, MAX_REACHABLE_NODES};
-Node exploredSet[MAX_EXPLORED_NODES]; // Это список исследованных узлов
+Node exploredSet[MAX_EXPLORED_NODES]; // This is a list of explored nodes
 Par exploredSetPar = {0, 0, MAX_EXPLORED_NODES};
 
-extern Coord pathSet[MAX_PATH_LENGH]; //Эта одномерная матрица путb объявлен в PathfindingAStar_Nano.ino
+extern Coord pathSet[MAX_PATH_LENGH]; // This is a one-dimensional matrix of the path declared in main.cpp
 extern Par pathSetPar;
-extern Coord obstacleSet[MAX_OBSTACLE_LENGH]; //Эта одномерная матрица препятствй объявлена в PathfindingAStar_Nano.ino
+extern Coord obstacleSet[MAX_OBSTACLE_LENGH]; // This is a one-dimensional matrix of obstacles declared in main.cpp
 extern Par obstacleSetPar;
 
-//Пошук шляху за алгоритмом A*
+//Path search using the A* algorithm
 ReturnCode findPath (Coord &start_coord, Coord &goal_coord){
   //0) reachableSet = []
   ClearNodes( reachableSet, reachableSetPar );
@@ -44,13 +44,11 @@ ReturnCode findPath (Coord &start_coord, Coord &goal_coord){
     //add in reachable = get_adjacent_nodes(node) - explored - reachable
     if(get_adjacent_nodes(node, start_coord) == -1) return ReturnFindPath(-104);
     
-
-    //Контроль-печать списков 
-    //Печатать список узлов
-    //Serial.print("reachableSet: ");
-    //printNodes(reachableSet, reachableSetPar);
-    //Serial.print("exploredSet: ");
-    //printNodes(exploredSet, exploredSetPar);
+    /* //WRM
+    if(exploredSetPar.setSize < 10) {
+      wrmPrintListOfNodes();     //Контроль-печать списков 
+    }
+    */
   }
   //If we get here, no path was found :(
   return ReturnFindPath(-105);
@@ -110,10 +108,12 @@ int get_adjacent_nodes(Node &node, Coord &start_coord){
 
       //Визначаємо вартість нового вузла nodeN.cost
       nodeNew.cost = node.cost + STEP_COST;
-      //Если node.parent_coord не стартовый узел
-      if( !(node.parent_coord.y==start_coord.y and node.parent_coord.x==start_coord.x) ){
-        //Перевіряємо напрямок та додаємо вартість повороту(Check the direction and add the cost of turning)
-        if(IsSameDirection(node.parent_coord, node.coord, c)== -1) nodeNew.cost += TURN_COST;
+      //Если node и node.parent_coord не стартовый узел
+      if(!(node.coord.y==start_coord.y and node.coord.x==start_coord.x)){
+        if( !(node.parent_coord.y==start_coord.y and node.parent_coord.x==start_coord.x) ){
+          //Перевіряємо напрямок та додаємо вартість повороту(Check the direction and add the cost of turning)
+          if(IsSameDirection(node.parent_coord, node.coord, c)== -1) nodeNew.cost += TURN_COST;
+        }
       }
 
       //Якщо вузол у списку досяжних, то порівнюємо вартість із наявною(If the node is in the list of reachable nodes, then we compare the cost with the existing one)
@@ -246,3 +246,27 @@ void testDirection(){
     Serial.println(" ");
   }
 }
+
+/*
+//Control-printing of lists
+void wrmPrintListOfNodes(){
+    Serial.print("reachableSet: ");
+    wrmPrintNodes(reachableSet, reachableSetPar);
+    Serial.print("exploredSet: ");
+    wrmPrintNodes(exploredSet, exploredSetPar);
+}
+//Print the list of nodes
+void wrmPrintNodes(Node *set, Par &setp){
+   if(setp.setSize>0){
+   for(int i=0; i<setp.setSize; i++){
+    Serial.print(i); Serial.print("|");
+    Serial.print("y"); Serial.print(set[i].coord.y);
+    Serial.print(",x"); Serial.print(set[i].coord.x);
+    Serial.print(",c"); Serial.print(set[i].cost);
+    Serial.print(","); Serial.print(set[i].parent_coord.y);
+    Serial.print(","); Serial.print(set[i].parent_coord.x);
+    Serial.print("|");
+   }
+   Serial.println("\n============");
+  }
+}*/

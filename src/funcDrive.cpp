@@ -92,7 +92,7 @@ void initEEPROM() {
 void initRealCoords() {
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
       realCoordsCurrent={155, 125}; //Текущие   175, 125
-      realCoordsGoal={155, 295};   //Цель 155, 295
+      realCoordsGoal={155, 265};   //Цель 155, 295 //При 155,265 путь искривляется, надо найти причину!
       xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
     else {
