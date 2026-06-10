@@ -5,6 +5,7 @@
 #include "config.hpp"       
 #include "funcTransfCoordsAngles.hpp"
 #include "funcArray.hpp"
+#include "funcPilot.hpp"
 
 //Obstacle array (in main.cpp):
 extern Coord obstacleSet[MAX_OBSTACLE_LENGH];
@@ -112,11 +113,20 @@ int seekObstacle(realCoord realCoordsCurrent, int currentAngle, int currentDista
   realCoord scannerRealCoords = calcRealCoords(realCoordsCurrent, currentAngle, currentDistanceCovered + scannerOffset);
   //Calculating real coordinates of the detected obstacle
   realCoord obstacleRealCoords = calcRealCoords(scannerRealCoords, currentAngle + scannerAngle, distanceM);
+    //Calculating real coordinates of the detected obstacle minus step
+  realCoord obstacleRealCoordsMinus = calcRealCoords(scannerRealCoords, currentAngle + scannerAngle, distanceM-STEP_GRID);
   //Transform real coordinates of the detected obstacle to grid coordinates
   Coord obstacleCoords = TransformRealToGridCoords(obstacleRealCoords);
+  //Transform real coordinates of the detected obstacle to grid coordinates for minus step
+  Coord obstacleCoordsMinus = TransformRealToGridCoords(obstacleRealCoordsMinus);
   //We check whether such an obstacle exists in the obstacle array.
   if(indexFindPointCoords(obstacleSet,obstacleSetPar, obstacleCoords)==-1) { //If the obstacle is new
-    return 1; //New obstacle detected
+    //Check if there is a fixed obstacle one step closer
+    if(indexFindPointCoords(obstacleSet,obstacleSetPar, obstacleCoordsMinus) == -1) {
+      String message = "New obstacle (grid): (" + String(obstacleCoords.y) + ", " + String(obstacleCoords.x) + ")";
+      addToJournal(message.c_str()); // Add message to journal
+      return 1; //New obstacle detected
+    }
   }
   return 0;
 }
