@@ -92,7 +92,7 @@ void initEEPROM() {
 void initRealCoords() {
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
       realCoordsCurrent={155, 125}; //Текущие   175, 125
-      realCoordsGoal={155, 265};   //Цель 155, 295 //При 155,265 путь искривляется, надо найти причину!
+      realCoordsGoal={155, 295};   //Цель 155, 295 
       xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
     else {
@@ -281,7 +281,8 @@ void cycleDrive(void){
             Serial.print(code.return_code);
             Serial.println("Pathfinding is unsuccessful!");
             displayMessage(3, "No path found!", 0, "");
-            addToJournal("No path found!" );
+            message = "No path found! Return code: " + String(code.return_code);
+            addToJournal(message.c_str());
             stage = STAGE_WAITE; //Stage Waiting control stage
             TankBuz(SIGNAL_NOPATH);
             return;
@@ -488,6 +489,7 @@ void cycleDrive(void){
         //Загрузить матрицу если она есть:
         if(EEPROM.read(0) != 0){
             obstacleSetPar.setSize = int(EEPROM.read(0));
+            obstacleSetPar.setSizeRealMax = obstacleSetPar.setSize;
             EEPROM.get(1, obstacleSet);
             Serial.println("Obstacle loaded");
         }

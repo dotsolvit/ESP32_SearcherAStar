@@ -21,6 +21,12 @@ extern Par obstacleSetPar;
 extern Coord routeSet[MAX_ROUTE_LENGH];
 extern Par routeSetPar;
 
+//Node lists - reachableSet (reachable nodes) and exploredSet (explored nodes) - from main.cpp
+extern Node reachableSet[MAX_REACHABLE_NODES]; // This is a list of reachable nodes
+extern Par reachableSetPar ;
+extern Node exploredSet[MAX_EXPLORED_NODES]; // This is a list of explored nodes 
+extern Par exploredSetPar ;
+
 //Real Coordinates
 extern realCoord realCoordsCurrent, realCoordsGoal; 
 
@@ -226,6 +232,11 @@ void handle_seejurnal(void) {
       journalHTML += "<li>" + String(journal[i]) + "</li>"; // Add journal entry to HTML list
     }
   }
+  journalHTML += "<p>PathMaxSize: " + String(pathSetPar.setSizeRealMax) + " from " + String(pathSetPar.setSizeMax) + "</p>";
+  journalHTML += "<p>ObstacleMaxSize: " + String(obstacleSetPar.setSizeRealMax) + " from " + String(obstacleSetPar.setSizeMax) + "</p>";
+  journalHTML += "<p>RouteMaxSize: " + String(routeSetPar.setSizeRealMax) + " from " + String(routeSetPar.setSizeMax) + "</p>";
+  journalHTML += "<p>ReachableMaxSize: " + String(reachableSetPar.setSizeRealMax) + " from " + String(reachableSetPar.setSizeMax) + "</p>";
+  journalHTML += "<p>ExploredMaxSize: " + String(exploredSetPar.setSizeRealMax) + " from " + String(exploredSetPar.setSizeMax) + "</p>";
   journalHTML += "</ul><button onclick=\"location.href='/'\">Home</button>"; // Add a button to return to the home page
   server.send(200, "text/html", journalHTML); // Send the generated HTML page with the journal entries
 }

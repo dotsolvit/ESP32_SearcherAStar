@@ -5,11 +5,11 @@
 #include "funcFindPath.hpp"
 #include "funcArray.hpp"
 
-//Creating node lists - reachableSet (reachable nodes) and exploredSet (explored nodes)
-Node reachableSet[MAX_REACHABLE_NODES]; // This is a list of reachable nodes
-Par reachableSetPar = {0, 0, MAX_REACHABLE_NODES};
-Node exploredSet[MAX_EXPLORED_NODES]; // This is a list of explored nodes
-Par exploredSetPar = {0, 0, MAX_EXPLORED_NODES};
+//Node lists - reachableSet (reachable nodes) and exploredSet (explored nodes) - from main.cpp
+extern Node reachableSet[MAX_REACHABLE_NODES]; // This is a list of reachable nodes
+extern Par reachableSetPar;
+extern Node exploredSet[MAX_EXPLORED_NODES]; // This is a list of explored nodes
+extern Par exploredSetPar;
 
 extern Coord pathSet[MAX_PATH_LENGH]; // This is a one-dimensional matrix of the path declared in main.cpp
 extern Par pathSetPar;

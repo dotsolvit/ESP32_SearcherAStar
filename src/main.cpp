@@ -12,6 +12,12 @@
 #include "funcMotors.hpp"
 #include "funcSensors.hpp"
 
+//Creating node lists - reachableSet (reachable nodes) and exploredSet (explored nodes)
+Node reachableSet[MAX_REACHABLE_NODES]; // This is a list of reachable nodes
+Par reachableSetPar = {0, 0, MAX_REACHABLE_NODES};
+Node exploredSet[MAX_EXPLORED_NODES]; // This is a list of explored nodes
+Par exploredSetPar = {0, 0, MAX_EXPLORED_NODES};
+
 //Create arrays for shared use in tasks (Створюємо масиви для спільного використання у завданнях)
 //Створюємо шлях (як масив координат та його параметри) 
 //Create a path (as an array of coordinates and its parameters)
