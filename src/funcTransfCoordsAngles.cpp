@@ -101,8 +101,11 @@ int seekAndSetObstacle(realCoord realCoordsCurrent, int currentAngle, int scanne
   Coord obstacleCoords = TransformRealToGridCoords(obstacleRealCoords);
   //We check whether such an obstacle exists in the obstacle array.
   if(indexFindPointCoords(obstacleSet,obstacleSetPar, obstacleCoords)==-1) { //If the obstacle is new
-    AddCoords(obstacleSet,obstacleSetPar, obstacleCoords);
-    //Not yet checked for the possibility of adding
+    if(AddCoords(obstacleSet,obstacleSetPar, obstacleCoords) == -1) {
+      String message = "Failed to add obstacle: (" + String(obstacleCoords.y) + ", " + String(obstacleCoords.x) + ")";
+      addToJournal(message.c_str()); // Add message to journal
+      return -1; //Failed to add new obstacle
+    }
   }
   return 0;
 }

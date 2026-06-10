@@ -215,7 +215,12 @@ int pilotScannerCircular(void) {
         scannerAngle += SCANNING_ANGLE_STEP; // Move to the next position
         if(scannerAngle <= SERVO_MAX_ANGLE) {
             setServo(scannerAngle);
-            if(distanceM > 0) seekAndSetObstacle(realCoordsCurrent, currentAngle, SCANNER_OFFSET, scannerAngle, distanceM); // Process the measurement to seek and set an obstacle
+            if(distanceM > 0) {
+                // Process the measurement to seek and set an obstacle
+                if(seekAndSetObstacle(realCoordsCurrent, currentAngle, SCANNER_OFFSET, scannerAngle, distanceM) == -1) { 
+                    return -1; // Failed to add new obstacle
+                }
+            }
         } else {
             scannerAngle = 0;
             setServo(scannerAngle);

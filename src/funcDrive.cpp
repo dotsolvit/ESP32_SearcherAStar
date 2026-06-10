@@ -397,7 +397,8 @@ void cycleDrive(void){
         if(movementStage == MOVEMENT_STOP_SCANNER){
             displayMessage(2, "STOP_SCANNER", 0, "");
             //The circular scanner for detect new obstacles
-            if(pilotScannerCircular() == 1) {
+            int result = pilotScannerCircular();
+            if(result == 1) {
                 addToJournal("End of circular scanning" );
                 xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
                 if(stage == STAGE_GO) {
@@ -409,6 +410,13 @@ void cycleDrive(void){
                     addToJournal("Stage RUN, RUN_FINDPATH, MOVEMENT_WAIT" );
                 }
                 movementStage = MOVEMENT_WAIT; //
+            }
+            else if(result == -1) {
+                addToJournal("Failed to add new obstacle from circular scanner" );
+                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                stage = STAGE_WAITE; //Stage Waiting control stage
+                movementStage = MOVEMENT_WAIT; //
+                addToJournal("Stage WAIT" );
             }
         }
     }
