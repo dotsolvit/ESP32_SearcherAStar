@@ -283,6 +283,11 @@ void cycleDrive(void){
             displayMessage(3, "No path found!", 0, "");
             message = "No path found! Return code: " + String(code.return_code);
             addToJournal(message.c_str());
+            //If retunn code is -105, need to look at the coordinates
+            if(code.return_code == -105) {
+                message = "Current realy=" + String(realCoordsCurrent.y) + ", x=" + String(realCoordsCurrent.x) + "; Goal y=" + String(goal_coord.y) + ", x=" + String(goal_coord.x);
+                addToJournal(message.c_str());
+            }
             stage = STAGE_WAITE; //Stage Waiting control stage
             TankBuz(SIGNAL_NOPATH);
             return;

@@ -118,7 +118,7 @@
 #define SIGNAL_OBSTACLE 2
 
 //Jurnal:
-#define JOURNAL_SIZE 100 //Maximum number of entries in the journal
+#define JOURNAL_SIZE 150 //Maximum number of entries in the journal
 #define JOURNAL_MESSAGE_LENGTH 50 //Maximum length of a message in the journal
 
 //Структура координат сітки
