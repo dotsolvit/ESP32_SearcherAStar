@@ -2,6 +2,8 @@
 
 # Educational project «Smart car that detects obstacles and plans a route using the A* algorithm» on ESP32
 
+![Real Photo](/images/Searcher_photo2.jpg)
+
 ## Short description
 This is an educational project that implements autonomous control of a model car on an ESP32 Witty Cloud. It uses a Sharp IR distance sensor (20–150 cm) mounted on an MG90S servo for obstacle detection, two optical encoders with slotted disks for odometry, an MPU-6050 accelerometer/gyroscope for heading, an OLED display, buzzer, motors, and other peripherals. Path planning is performed using the A* algorithm; obstacles detected during motion are added to the obstacle map and routes are recalculated accordingly.
 
