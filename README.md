@@ -9,7 +9,7 @@ This is an educational project that implements autonomous control of a model car
 
 ## Features
 - **Start/Goal:** Set start and goal coordinates to begin navigation.
-- **A* path planning:** Computes shortest route (minimizing distance and turns) using the known obstacle map at calculation time.
+- **A-star path planning:** Computes shortest route (minimizing distance and turns) using the known obstacle map at calculation time.
 - **Two-stage motion:** Each move executes a rotation (multiple of 45°) followed by straight movement.
 - **On-the-fly obstacle detection:** IR sensor scans ±6° during straight motion; on detecting an unknown obstacle the vehicle stops and performs a wide-angle scan.
 - **Wide-angle scanning:** Stationary scan at ±90° for accurate mapping of new obstacles (map grid step = 10 cm).
@@ -28,7 +28,7 @@ This is an educational project that implements autonomous control of a model car
 - **Power:** two 18650 Li-ion cells, 2S BMS with balancing, LM2596 DC-DC step-down, and 2S Li-ion charger module (Type-C)
 
 ## Schematic
-See the wiring schematic: ![Schematic](/images/Schematic_ESP32_SearcherAStar.png)
+Electrical diagram and connections: ![Schematic](/images/Schematic_ESP32_SearcherAStar.png)
 
 ## Code and build
 The project is developed with PlatformIO (Visual Studio Code + PlatformIO) using the Arduino framework. The code is written in C/C++ and uses FreeRTOS to distribute tasks across the two ESP32 cores (WiFi/web server on one core, other tasks on the other core). The A* implementation follows "Pathfinding Demystified. Generic Search Algorithm. Practical A*" (https://www.gabrielgambetta.com/generic-search.html).
