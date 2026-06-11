@@ -5,7 +5,7 @@
 ![Real Photo](/images/Searcher_photo2.jpg)
 
 ## Short description
-This is an educational project that implements autonomous control of a model car on an ESP32 Witty Cloud. It uses a Sharp IR distance sensor (20–150 cm) mounted on an MG90S servo for obstacle detection, two optical encoders with slotted disks for odometry, an MPU-6050 accelerometer/gyroscope for heading, an OLED display, buzzer, motors, and other peripherals. Path planning is performed using the A* algorithm; obstacles detected during motion are added to the obstacle map and routes are recalculated accordingly.
+This is an educational project that implements autonomous control of a model car on an ESP32. It uses a Sharp IR distance sensor (20–150 cm) mounted on an MG90S servo for obstacle detection, two optical encoders with slotted disks for odometry, an MPU-6050 accelerometer/gyroscope for heading, an OLED display, buzzer, motors, and other peripherals. Path planning is performed using the A* algorithm; obstacles detected during motion are added to the obstacle map and routes are recalculated accordingly.
 
 ## Features
 - **Start/Goal:** Set start and goal coordinates to begin navigation.
@@ -17,7 +17,7 @@ This is an educational project that implements autonomous control of a model car
 - **Termination:** Movement ends upon reaching the goal or when no feasible route can be built.
 
 ## Components and wiring
-- **Microcontroller:** ESP32 (Witty Cloud)
+- **Microcontroller:** ESP32 LuaNode32 Type-C (38-pin)
 - **Motors:** Four geared DC motors (1:48, 6–8V) with wheels
 - **IR distance sensor:** Sharp GP2Y0A02YK0F (20–150 cm)
 - **Servo:** MG90S (for aiming the IR sensor)
@@ -55,3 +55,5 @@ platformio run -t upload
 This project demonstrates ESP32 programming, peripheral control, creating an embedded web server, and remote control via WiFi from a smartphone or computer.
 
 Good luck and enjoy experimenting!
+
+P.S. The project was developed as a coursework while studying ESP32, Ground Drone, Unmanned Ground Vehicle and GITHUB courses at Nanit Academy: https://www.linkedin.com/company/nanitrobot/
