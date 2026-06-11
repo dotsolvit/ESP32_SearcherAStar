@@ -1,3 +1,5 @@
+[Читати мене Українською](README_uk.md)
+
 # Educational project «Smart car that detects obstacles and plans a route using the A* algorithm» on ESP32
 
 ## Short description
@@ -24,7 +26,7 @@ This is an educational project that implements autonomous control of a model car
 - **Power:** two 18650 Li-ion cells, 2S BMS with balancing, LM2596 DC-DC step-down, and 2S Li-ion charger module (Type-C)
 
 ## Schematic
-See the wiring schematic: ![Schematic](doc/images/Schematic_ESP32_SearcherAStar.png)
+See the wiring schematic: ![Schematic](/images/Schematic_ESP32_SearcherAStar.png)
 
 ## Code and build
 The project is developed with PlatformIO (Visual Studio Code + PlatformIO) using the Arduino framework. The code is written in C/C++ and uses FreeRTOS to distribute tasks across the two ESP32 cores (WiFi/web server on one core, other tasks on the other core). The A* implementation follows "Pathfinding Demystified. Generic Search Algorithm. Practical A*" (https://www.gabrielgambetta.com/generic-search.html).

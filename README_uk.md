@@ -1,3 +1,5 @@
+[Read me in English](README.md)
+
 # Навчальний проєкт «Розумна машинка, яка виявляє перешкоди та планує маршрут за допомогою алгоритму A*» на ESP32
 
 ## Короткий опис
@@ -24,7 +26,7 @@
 - **Зумер:** пасивний зумер
 - **Живлення:** два акумулятори 18650, BMS 2S з балансуванням, понижуючий конвертер LM2596, модуль зарядки 2S (Type-C)
 
-Електрична схема та з'єднання: ![Schematic](doc/images/Schematic_ESP32_SearcherAStar.png)
+Електрична схема та з'єднання: ![Schematic](/images/Schematic_ESP32_SearcherAStar.png)
 
 ## Код програми
 Проєкт створено в PlatformIO (Visual Studio Code + PlatformIO) з Arduino framework. Мова програмування C/C++. Використовується FreeRTOS для розподілу задач між ядрами ESP32 (WiFi/веб-сервер на одному ядрі, інші задачі на іншому). Алгоритм A* реалізовано за статтею «Pathfinding Demystified. Generic Search Algorithm. Practical A*» (https://www.gabrielgambetta.com/generic-search.html).
