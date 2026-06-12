@@ -36,17 +36,17 @@ ReturnCode findPath (Coord &start_coord, Coord &goal_coord){
     }
     //6) Don't repeat ourselves.
     //reachable.remove(node)
-    if(RemoveNode(reachableSet, reachableSetPar, node) == -1) return ReturnFindPath(-102); //Удалить узел
+    if(RemoveNode(reachableSet, reachableSetPar, node) == -1) return ReturnFindPath(-102); //Delete node
     //explored.add(node)
-    if(AddNode(exploredSet, exploredSetPar, node) == -1) return ReturnFindPath(-103); //Добавить узел
+    if(AddNode(exploredSet, exploredSetPar, node) == -1) return ReturnFindPath(-103); //Add a node
 
-    //7) Доповнюємо список досяжних вузлів сполученими вузлами(We supplement the list of reachable nodes with connected nodes)
+    //7)We supplement the list of reachable nodes with connected nodes
     //add in reachable = get_adjacent_nodes(node) - explored - reachable
     if(get_adjacent_nodes(node, start_coord) == -1) return ReturnFindPath(-104);
     
     /* //WRM
     if(exploredSetPar.setSize < 10) {
-      wrmPrintListOfNodes();     //Контроль-печать списков 
+      wrmPrintListOfNodes();     //Control-printing of lists 
     }
     */
   }
@@ -54,7 +54,7 @@ ReturnCode findPath (Coord &start_coord, Coord &goal_coord){
   return ReturnFindPath(-105);
 }
 
-//Вибираю вузол із найменшою вартістю (Choose a node with the lowest cost)
+//Choose a node with the lowest cost
 Node choose_node(Node *set, Par &setp, Coord &goal_coord){
   Node best_node = set[0];
   int best_cost = set[0].cost+estimate_distance(best_node, goal_coord);
@@ -69,12 +69,12 @@ Node choose_node(Node *set, Par &setp, Coord &goal_coord){
 }
 
 //build and return the path 
-//Функція, яка будує шлях, слідуючи за посиланнями previous назад до початкового вузла
+//Function that builds the path by following the previous pointers back to the starting node
 int build_path(Node& start_node, Node& goal_node){
   Coord poin, parent_point;
-  //1)Очистить путь
+  //1)Clear the waypoint list (pathSet) and its parameters (pathSetPar)
   ClearCoords(pathSet, pathSetPar);
-  //added node Добавляемый узел
+  //added node = goal node
   Node added_node=goal_node;
   while(true){
     poin = added_node.coord;
@@ -88,47 +88,47 @@ int build_path(Node& start_node, Node& goal_node){
   return 0;
 }
 
-//7) Доповнюємо список досяжних вузлів сполученими вузлами(We supplement the list of reachable nodes with connected nodes)
+//7)We supplement the list of reachable nodes with connected nodes
 //add in reachable = get_adjacent_nodes(node) - explored - reachable
 int get_adjacent_nodes(Node &node, Coord &start_coord){
   Coord c;
   Node nodeNew;
   for(int dy=-1; dy<2; dy++){
     for(int dx=-1; dx<2; dx++){
-      if(dx==0 and dy==0) continue; //Центральную точку не смотрим, это node
+      if(dx==0 and dy==0) continue; //We don't look at the central point, this is the node
       int y=dy+node.coord.y; 
-      if(y<0) continue; //Отрицательные координаты - вне карты
+      if(y<0) continue; //Negative coordinates - outside the map
       c.y= y;
       int x= dx+node.coord.x;
-      if(x<0) continue; //Отрицательные координаты - вне карты
+      if(x<0) continue; //Negative coordinates - outside the map
       c.x= x;
-      if( IsThisNodePossible(c) == -1) continue; //Если узел не допустим
-      //Если узел уже исследован (есть в explored)
-      if(indexFindNode(exploredSet, exploredSetPar, c) != -1) continue;//Узел уже исследован
+      if( IsThisNodePossible(c) == -1) continue; //If the node is not valid
+      //If the node is already explored (is in explored)
+      if(indexFindNode(exploredSet, exploredSetPar, c) != -1) continue;//Node already explored
 
-      //Визначаємо вартість нового вузла nodeN.cost
+      //We determine the cost of the new node nodeN.cost
       nodeNew.cost = node.cost + STEP_COST;
-      //Если node и node.parent_coord не стартовый узел
+      //If the node and node.parent_coord are not the starting node
       if(!(node.coord.y==start_coord.y and node.coord.x==start_coord.x)){
         if( !(node.parent_coord.y==start_coord.y and node.parent_coord.x==start_coord.x) ){
-          //Перевіряємо напрямок та додаємо вартість повороту(Check the direction and add the cost of turning)
+          //Check the direction and add the cost of turning
           if(IsSameDirection(node.parent_coord, node.coord, c)== -1) nodeNew.cost += TURN_COST;
         }
       }
 
-      //Якщо вузол у списку досяжних, то порівнюємо вартість із наявною(If the node is in the list of reachable nodes, then we compare the cost with the existing one)
+      //If the node is in the list of reachable nodes, then we compare the cost with the existing one
       int index=indexFindNode(reachableSet, reachableSetPar, c);
-      if(index !=-1){ //Узел уже в списке достижимых
-        if(reachableSet[index].cost > nodeNew.cost){ //Якщо новий шлях коротший, то міняємо шлях та вартість(If the new path is shorter, then we change the path and cost)
+      if(index !=-1){ //The node is already in the reachable list.
+        if(reachableSet[index].cost > nodeNew.cost){ //If the new path is shorter, then we change the path and cost
           reachableSet[index].parent_coord = node.coord;
           reachableSet[index].cost = nodeNew.cost;
         }
       }
-      else { //Такого вузла немає у списку досяжних(If there is no such node in the list of reachable nodes)
-        //Додаємо вузол до списку досяжних вузлів(Add a node to the list of reachable nodes)
+      else { //If there is no such node in the list of reachable nodes
+        //Add a node to the list of reachable nodes
         nodeNew.coord = c;
         nodeNew.parent_coord = node.coord;
-        if(AddNode(reachableSet, reachableSetPar, nodeNew) == -1) return -1; //Не вдалося додати вузол(Failed to add node)
+        if(AddNode(reachableSet, reachableSetPar, nodeNew) == -1) return -1; //Failed to add node
       }
     }
   }
@@ -136,28 +136,28 @@ int get_adjacent_nodes(Node &node, Coord &start_coord){
 }
 
 //Is This Node Possible?
-//Перевіряємо на знаходження вузла та суміжних з ним вузлів:
-// - усередині карти
-// - поза перешкодами
+//Checks for the location of the node and its adjacent nodes:
+// - inside the map
+// - outside the obstacles)
 int IsThisNodePossible(Coord &c){
   Coord cc;
   for(int dy=-1; dy<2; dy++){
     for(int dx=-1; dx<2; dx++){
       int y=dy+c.y; 
-      if(y<0) return -1; //Негативні координати - поза картою(Negative coordinates - outside the map)
+      if(y<0) return -1; //Negative coordinates - outside the map
       cc.y= y;
       int x= dx+c.x;
-      if(x<0) return -1; //Негативні координати - поза картою(Negative coordinates - outside the map)
+      if(x<0) return -1; //Negative coordinates - outside the map
       cc.x= x;
-      if(cc.y > SIZE_MAP_Y-1) return -1; //Вне карты по Y
-      if(cc.x > SIZE_MAP_X-1) return -1; //Вне карты по X
-      if(indexFindPointCoords(obstacleSet, obstacleSetPar, cc) != -1 ) return -1;   //У цій точці є перешкода(There is an obstacle at this point)
+      if(cc.y > SIZE_MAP_Y-1) return -1; //Outside the map along the Y-axis
+      if(cc.x > SIZE_MAP_X-1) return -1; //Outside the map along the X-axis
+      if(indexFindPointCoords(obstacleSet, obstacleSetPar, cc) != -1 ) return -1;   //There is an obstacle at this point
     }
   }
   return 0;
 }
 
-//Функція, що оцінює відстань від поточного до кінцевого вузла(Function that estimates the distance from the current node to the goal node)
+//Function that estimates the distance from the current node to the goal node
 int estimate_distance(Node &node, Coord &goal_coord){
   long dy=node.coord.y - goal_coord.y;
   dy=dy*dy;
@@ -173,7 +173,7 @@ int estimate_distance(Node &node, Coord &goal_coord){
   */
 }
 
-//Код повернення(Return code)
+//Return code
 ReturnCode ReturnFindPath(int code){
   ReturnCode ret_code;
   ret_code.return_code=code;
@@ -184,30 +184,29 @@ ReturnCode ReturnFindPath(int code){
 
 //Compress Path:
 void compressPath(void){
-  if(pathSetPar.setSize < 3) return; //Нема чого стискати(Nothing to compress)
+  if(pathSetPar.setSize < 3) return; //Nothing to compress
   int index=pathSetPar.setSize-1;
   while(true){
-    //Три точки на одній лінії? (Three points on the same line?)
+    //Three points on the same line?
     if(IsSameDirection(pathSet[index], pathSet[index-1], pathSet[index-2]) == 0 ) {
-       //Удаляем точку с индексом index-1
+       //Removing the point with index-1
        if(RemoveCoords( pathSet, pathSetPar, index-1 ) == 0){
-         Serial.print("The Path Point has been removed. Index="); //Якщо вдалося видалити(If the point was successfully removed)
+         Serial.print("The Path Point has been removed. Index="); //If the point was successfully removed
          Serial.println(index-1);
        }
        else{
-         Serial.print("The Path Point was not deleted! Index="); //Якщо не вдалося видалити(If the point was not deleted)
+         Serial.print("The Path Point was not deleted! Index="); //If the point was not deleted
          Serial.println(index-1);
        }
     }
     index -=1;
-    if(index <= 1) break; //Нема чого стискати(Nothing to compress)
+    if(index <= 1) break; //Nothing to compress
   }
   return;
 }
 
 //Directions
 
-//Функція визначення простого напрямку з А в (градуси за годинниковою стрілкою):
 //Function to determine simple direction from A to B (degrees clockwise):
 int Direction(Coord &a, Coord &b){
   int angleInDegrees;
@@ -230,7 +229,7 @@ int IsSameDirection(Coord &a, Coord &b, Coord &c){
 }
 
 
-//Тест функції напрямку (Test of the direction function)
+//Test of the direction function
 void testDirection(){
   Coord a, b;
   a={5, 9};
