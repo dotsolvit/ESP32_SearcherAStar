@@ -21,5 +21,5 @@ void initBuzzer();
 //Init MPU6050:
 void initMPU6050();
 
-// виконуємо основну логіку керування (execute main drive logic)
+//Execute main drive logic
 void cycleDrive(void);

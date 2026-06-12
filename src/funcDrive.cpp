@@ -24,14 +24,14 @@ extern Coord routeSet[MAX_ROUTE_LENGH];
 extern Par routeSetPar;
 
 //Real Coordinates (in main.cpp):
-extern realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
+extern realCoord realCoordsCurrent, realCoordsGoal; //Current and goal coordinates
 
 //Mutex for synchronizing access to shared matrixes (in main.cpp):
 extern SemaphoreHandle_t xMutex;
 
 extern QueueHandle_t toWebQueue, toDriveQueue;   // two FreeRTOS queues: toWeb and toDrive (in main.cpp)
 
-extern int currentAngle, displayed_currentAngle; //Текущий угол по Х (in main.cpp)
+extern int currentAngle, displayed_currentAngle; //Current angle along the X-axis (in main.cpp)
 
 //Distance covered counters:
 extern int distancePulseCounterLeft;
@@ -55,7 +55,7 @@ byte stage, displayed_stage;
 
 
 //Angle
-extern int currentAngle, displayed_currentAngle; //Текущий угол по Х
+extern int currentAngle, displayed_currentAngle; //Current angle along the X-axis
 
 //Scanner angle:    
 int scannerAngle;
@@ -76,7 +76,7 @@ byte movementStage;
 byte runStage;
 
 
-// змінні для обміну даними між задачами (variables for data exchange between tasks)
+//Vvariables for data exchange between tasks
 byte sendedByte, receivedByte; 
 
 //Distance covered:
@@ -89,14 +89,14 @@ void initEEPROM() {
 }
 
 //Init Real Coordinates:
-void initRealCoords() {
-    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-      realCoordsCurrent={155, 125}; //Текущие   175, 125
-      realCoordsGoal={155, 295};   //Цель 155, 295 
-      xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+    void initRealCoords() {
+    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Lock mutex for safe access to shared variables
+      realCoordsCurrent={155, 125}; //Current   175, 125
+      realCoordsGoal={155, 295};   //Goal 155, 295 
+      xSemaphoreGive(xMutex); // Release mutex after done
     } 
     else {
-      Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+      Serial.println("Failed to take mutex in initRealCoords!"); // Print error message if failed to take mutex
     }
     
     //Get rotation angle in degrees:
@@ -106,51 +106,51 @@ void initRealCoords() {
 
 //Init Obstacle Set:
 int initializationObstacleSet(){
-    Serial.println("initializationObstacleSet() called"); // Виводимо повідомлення про виклик функції (Print message about function call)
+    Serial.println("initializationObstacleSet() called"); // Print message about function call
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
         //Clear Obstacle Set:
         ClearCoords(obstacleSet, obstacleSetPar);
-        xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+        xSemaphoreGive(xMutex); // Release mutex after done
     } 
     else {
-        Serial.println("Failed to take mutex in initializationObstacleSet!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
-        return -1; // Повертаємо -1 у випадку помилки (Return -1 on error)
+        Serial.println("Failed to take mutex in initializationObstacleSet!"); // Print error message if failed to take mutex
+        return -1; // Return -1 on error
     }  
-    return 0; // Повертаємо 0 при успішному завершенні (Return 0 on success) 
+    return 0; // Return 0 on success 
 }
 
 //Initialization Route Set:
 int initializationRouteSet(){
-    Serial.println("initializationRouteSet() called"); // Виводимо повідомлення про виклик функції (Print message about function call)
+    Serial.println("initializationRouteSet() called"); // Print message about function call
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
         //Clear Route Set:
         ClearCoords(routeSet, routeSetPar);
-        xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+        xSemaphoreGive(xMutex); // Release mutex after done
     } 
     else {
-        Serial.println("Failed to take mutex in initializationRouteSet!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
-        return -1; // Повертаємо -1 у випадку помилки (Return -1 on error)
+        Serial.println("Failed to take mutex in initializationRouteSet!"); // Print error message if failed to take mutex
+        return -1; // Return -1 on error
     }  
-    return 0; // Повертаємо 0 при успішному завершенні (Return 0 on success) 
+    return 0; // Return 0 on success 
 }
 
 //Init Stage:
 void initStage() {
-    stage = STAGE_WAITE; // Початковий етап - очікування (Initial stage - waiting)
-    displayed_stage = 255; // Невідображений етап (Undisplayed stage)
-    movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
+    stage = STAGE_WAITE; // Initial stage - waiting
+    displayed_stage = 255; // Undisplayed stage
+    movementStage = MOVEMENT_WAIT; // Initial movement stage - waiting
 }
 
 
 //Init MPU6050:
 void initMPU6050() {
-    initializationMPU6050(); // Ініціалізація MPU6050 (MPU6050 initialization)
+    initializationMPU6050(); // MPU6050 initialization
 }
 
-// виконуємо основну логіку керування (execute main drive logic)
+//Execute main drive logic
 void cycleDrive(void){
     //display the stage:
-    if(displayed_stage != stage) { // Якщо етап змінився (If stage has changed)
+    if(displayed_stage != stage) { // If stage has changed
         Serial.print("Stage: ");
         if(stage == STAGE_WAITE) {
             displayMessage(1, "Stage: WAITE", 0, "");
@@ -180,7 +180,7 @@ void cycleDrive(void){
             displayMessage(1, "Stage: UNKNOWN", 0, "");
             Serial.println("UNKNOWN");
         }
-        displayed_stage = stage; // Оновлюємо відображений етап (Update displayed stage)
+        displayed_stage = stage; // Update displayed stage
     }  
     
     //Stage 0 - Waiting control stage
@@ -198,19 +198,19 @@ void cycleDrive(void){
         displayMessage(3, "Dist Covered= ", distanceCovered, "cm");
         //WRM
 
-        if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //Як що є данні від Web (If there are data from Web)
+        if(uxQueueMessagesWaiting( toDriveQueue ) > 0) { //If there are data from Web
             xQueueReceive(toDriveQueue, &receivedByte, 0);
             String receivedByteStr = String((char)receivedByte); // Convert byte to String for display 
-            Serial.println("Received byte from Web: " + receivedByteStr); // Виводимо отриманий байт для перевірки (Print received byte for verification)   
+            Serial.println("Received byte from Web: " + receivedByteStr); // Print received byte for verification   
             displayMessage(3, receivedByteStr.c_str(), 0, "");
-            // Обробляємо отриманий байт (Process received byte)
+            // Process received byte
             if(receivedByte == ' ') { //If get ' ' command
                 return;
             }
             else if(receivedByte == 'G') { //If get "GO" command
                 initJournal(); //Init journal for GO stage
                 stage = STAGE_GO;
-                movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
+                movementStage = MOVEMENT_WAIT; // Initial movement stage - waiting
                 return;
             }
             else if(receivedByte == 'F') { //If get "Find Path" command
@@ -281,7 +281,7 @@ void cycleDrive(void){
 
         if(stage == STAGE_RUN) {
             runStage = RUN_GO; // Move to RUN stage - go!
-            movementStage = MOVEMENT_WAIT; // Початковий етап руху - очікування (Initial movement stage - waiting)
+            movementStage = MOVEMENT_WAIT; // Initial movement stage - waiting
             addToJournal("Stage RUN, RUN_GO, MOVEMENT_WAIT" );
         }
         else stage = STAGE_WAITE; //Stage Waiting control stage
@@ -291,8 +291,8 @@ void cycleDrive(void){
     if(stage == STAGE_GO or (stage == STAGE_RUN and runStage == RUN_GO)) { //If it's GO stage or Run stage 
         if(movementStage == MOVEMENT_WAIT){
             displayMessage(2, "MOVEMENT_WAIT", 0, "");
-            if (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-                Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+            if (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE) { // Lock mutex for safe access to shared variables
+                Serial.println("Failed to take mutex in initRealCoords!"); // Print error message if failed to take mutex
                 displayMessage(3, "Failed mutex!", 0, "");
                 addToJournal("Failed to take mutex in GO stage!" );
                 stage = STAGE_WAITE; //Stage Waiting control stage
@@ -309,7 +309,7 @@ void cycleDrive(void){
                 addToJournal("Failed pilot init!" );
                 stage = STAGE_WAITE; //Stage Waiting control stage
                 movementStage = MOVEMENT_WAIT; //
-                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                xSemaphoreGive(xMutex); // Release mutex after done
                 return;
             }
             TankBuz(SIGNAL_GO);
@@ -364,7 +364,7 @@ void cycleDrive(void){
                     //If we have reached the final point of the journey
                     if(pathIndexForGo == 0){
                         TankBuz(SIGNAL_GO);
-                        xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                        xSemaphoreGive(xMutex); // Release mutex after done
                         stage = STAGE_WAITE;
                         movementStage = MOVEMENT_WAIT; //
                         Serial.println("It is Goal Point!");
@@ -380,7 +380,7 @@ void cycleDrive(void){
             int result = pilotScannerCircular();
             if(result == 1) {
                 addToJournal("End of circular scanning" );
-                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                xSemaphoreGive(xMutex); //Release mutex after done
                 if(stage == STAGE_GO) {
                     stage = STAGE_WAITE; //Stage Waiting control stage
                     addToJournal("Stage WAIT" );
@@ -393,7 +393,7 @@ void cycleDrive(void){
             }
             else if(result == -1) {
                 addToJournal("Failed to add new obstacle from circular scanner" );
-                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+                xSemaphoreGive(xMutex); // Release mutex after done
                 stage = STAGE_WAITE; //Stage Waiting control stage
                 movementStage = MOVEMENT_WAIT; //
                 addToJournal("Stage WAIT" );
@@ -431,7 +431,7 @@ void cycleDrive(void){
     //Stage STAGE_LOADOBSTACLES
     if(stage == STAGE_LOADOBSTACLES){
         Serial.println("Load Obstacles from EEPROM");
-        //Загрузить матрицу если она есть:
+        //Load the matrix if it exists:
         if(EEPROM.read(0) != 0){
             obstacleSetPar.setSize = int(EEPROM.read(0));
             obstacleSetPar.setSizeRealMax = obstacleSetPar.setSize;
@@ -455,7 +455,7 @@ void cycleDrive(void){
     }
     //Stage STAGE_CLEAROBSTACLES
     if(stage == STAGE_CLEAROBSTACLES){
-        //Очистить одномерную матрицу координат
+        //Clear the one-dimensional coordinate matrix
         ClearCoords(obstacleSet, obstacleSetPar);
         Serial.println("Set Obstacles cleared");
         stage = STAGE_WAITE; //Stage Waiting control stage
