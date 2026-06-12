@@ -1,10 +1,66 @@
 //config.hpp
-//Заголовочний файл для зберігання конфігураційних налаштувань та констант
+//Header file for storing configuration settings and constants
 
-// Для більшості плат ESP32 вбудований світлодіод на 2 піні
+//MAP:
+//Size of the map 55*35
+#define SIZE_MAP_Y 55  //55
+#define SIZE_MAP_X 35  //35
+#define STEP_GRID 10 //grid step of the map 10cm
+#define DIAGONAL_STEP_GRID 14 //grid step along the diagonal (10 * sqrt(2))
+
+//ARRAYS:
+#define MAX_REACHABLE_NODES 150  //Maximum nodes in reachableSet 
+#define MAX_EXPLORED_NODES 500   //Maximum nodes in exploredSet
+#define MAX_PATH_LENGH 150       //Maximum coordinates in pathSet 
+#define MAX_OBSTACLE_LENGH 400   //Maximum coordinates in obstacleSet 
+#define MAX_ROUTE_LENGH 200      //Maximum coordinates in routeSet 
+
+#define JOURNAL_SIZE 150 //Maximum number of entries in the journal
+#define JOURNAL_MESSAGE_LENGTH 50 //Maximum length of a message in the journal
+
+//STRUCTURES:
+//Grid coordinate structure
+struct Coord {
+  uint8_t y, x;     // Coordinates from 0 to 255
+};
+//Structure of real coordinates
+struct realCoord {
+  int y, x;     // Real coordinates
+};
+
+//Parameters of the node list or coordinates
+struct Par {
+  int setSize;
+  int setSizeRealMax;
+  int setSizeMax; 
+};
+
+//Structure of a node (Node)
+struct Node {
+    Coord coord;     // Coordinates y,x (from 0 to 255)
+    uint16_t cost;   // Cost of the path from the start
+    Coord parent_coord; // Coordinates for path reconstruction
+};
+
+//Return code of the pathfinding function
+struct ReturnCode {
+  int return_code;
+  int reachableSet;
+  int exploredSet;
+};
+
+
+//COMPONENTS:
+
+//Built-in LED 
 #define LED_BUILTIN 2
 
-#define BUZ_PIN 4 //Buzzer
+//Buzzer
+#define BUZ_PIN 4 
+//Tank signals:
+#define SIGNAL_GO 0
+#define SIGNAL_NOPATH 1
+#define SIGNAL_OBSTACLE 2
 
 //Ultrasonic sensor pins
 #define TRIG_PIN 27
@@ -27,37 +83,20 @@
 #define IR_MAX_DISTANCE 150 //the maximum distance that the IR sensor can measure (in centimeters)
 #define IR_MIN_DISTANCE 20  //the minimum distance that the IR sensor can measure (in centimeters)
 //Coefficients of the approximating equation distance = A * x ^ B
-//5,0V :
-//#define COEFFICIENT_A 22261
-//#define COEFFICIENT_B -0.8476
 //4,8V :
 #define COEFFICIENT_A 24292
 #define COEFFICIENT_B -0.8586
+//Delay for normalization of the IR sensor readings
+#define IR_NORMALIZATION_DELAY 25 //in milliseconds
 
 //Battery voltage control
 //ADC1 GPIO 35 – battery control
 #define PIN_BAT 35
+#define RESISTOR_RATIO 3.119 // (9.81k + 4.63k) / 4.63k voltage divider
 //Battery monitoring period (in milliseconds)
 #define BATTERY_MONITORING_PERIOD 2000
 //EMA filtering coefficient (from 0.0 to 1.0)
 #define EMA_FILTERING_COEFFICIENT 0.25 
-
-#define STEP_COST 50
-#define TURN_COST 1
-#define STEP_GRID 10 //шаг сетки карты 10см
-#define DIAGONAL_STEP_GRID 14 //шаг сетки по диагонали (10 * sqrt(2))
-
-//Размер карты 55*35
-#define SIZE_MAP_Y 55  //55
-#define SIZE_MAP_X 35  //35
-
-#define MAX_REACHABLE_NODES 150  //Maximum nodes in reachableSet //100
-#define MAX_EXPLORED_NODES 500   //Maximum nodes in exploredSet
-#define MAX_PATH_LENGH 150       //Maximum coordinates in pathSet //100
-#define MAX_OBSTACLE_LENGH 400   //Maximum coordinates in obstacleSet //150
-#define MAX_ROUTE_LENGH 200      //Maximum coordinates in routeSet //150
-
-#define RESISTOR_RATIO 3.119 // (9.81k + 4.63k) / 4.63k делитель напряжения 
 
 //Display OLED
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -65,17 +104,14 @@
 #define SCREEN_ADDRESS 0x3C
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 
+//Odometry sensors:
 //interrupt:
-//GPIO 32 – optical sensor L
-//GPIO 33 – optical sensor R
-#define IRSENSOR_LEFT_PIN 32
-#define IRSENSOR_RIGHT_PIN 33
-
+#define IRSENSOR_LEFT_PIN 32  //optical sensor L
+#define IRSENSOR_RIGHT_PIN 33 //optical sensor R
 //odometer - distance per impulse cm
 #define DISTANCE_PER_IMPULSE 1.028  // cm/pulse
 
-
-
+//Motor control:
 // PWM settings for motors
 #define MOTORS_PWM_FREQ 5000
 #define MOTORS_PWM_RESOLUTION 8
@@ -98,7 +134,8 @@
 #define DISTANCE_SPEED_SLOW 20 //cm  //15
 //braking distance in cm
 #define BRAKING_DISTANCE 5
-
+//Delay to check for a complete stop (in milliseconds)
+#define STOP_CHECK_DELAY 50
 
 //SERVO
 //servo with min/max pulse widths:
@@ -112,42 +149,12 @@
 
 
 
-//Tank signals:
-#define SIGNAL_GO 0
-#define SIGNAL_NOPATH 1
-#define SIGNAL_OBSTACLE 2
+//OTHERS:
 
-//Jurnal:
-#define JOURNAL_SIZE 150 //Maximum number of entries in the journal
-#define JOURNAL_MESSAGE_LENGTH 50 //Maximum length of a message in the journal
+//Cost parameters when calculating a route
+#define STEP_COST 50
+#define TURN_COST 1
 
-//Структура координат сітки
-struct Coord {
-  uint8_t y, x;     // Координаты (0-255)
-};
-//Структура реальних координат
-struct realCoord {
-  int y, x;     // Координаты реальные
-};
 
-//Параметри списку вузлів чи координат(parameters)
-struct Par {
-  int setSize;
-  int setSizeRealMax;
-  int setSizeMax; 
-};
-
-//Структура вузла (Node)
-struct Node {
-    Coord coord;     // Координаты y,x (0-255)
-    uint16_t cost;   // Стоимость пути от старта
-    Coord parent_coord; // Координаты восстановления пути
-};
-
-//Код повернення функції пошуку шляху Return code of the pathfinding function
-struct ReturnCode {
-  int return_code;
-  int reachableSet;
-  int exploredSet;
-};
-
+//Baud rate for Serial communication
+#define SERIAL_BAUD_RATE 115200

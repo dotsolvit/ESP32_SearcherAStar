@@ -107,7 +107,7 @@ int pilotStop(void) {
         addToJournal(message.c_str()); // Add message to journal
         //full stop:
         for(int i=0; i<20; i++) {
-            vTaskDelay(50 / portTICK_PERIOD_MS); // затримка 50 мс
+            vTaskDelay(STOP_CHECK_DELAY / portTICK_PERIOD_MS); //Delay to check for a complete stop (in milliseconds)
             int realDistanceCovered = odometer();
             if(realDistanceCovered == currentDistanceCovered) {
                 Serial.print("realDistanceCovered = "); Serial.print(realDistanceCovered); Serial.print(" distanceToTheNextPoint = "); Serial.println(distanceToTheNextPoint);
@@ -205,9 +205,9 @@ int pilotScannerCircular(void) {
     if (millis() - lastScanTime >= SCANNING_PERIOD) {
         lastScanTime = millis();
         distance0 = IR_Distance();
-        vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+        vTaskDelay(IR_NORMALIZATION_DELAY / portTICK_PERIOD_MS); //Delay for normalization of the IR sensor readings
         distance1 = IR_Distance(); 
-        vTaskDelay(25 / portTICK_PERIOD_MS); // затримка 25 мс
+        vTaskDelay(IR_NORMALIZATION_DELAY / portTICK_PERIOD_MS); //Delay for normalization of the IR sensor readings
         distance2 = IR_Distance();
         int distanceM= medianFilter(distance0, distance1, distance2); // Apply median filter to the three measurements
         //String message = " 0=" + String(distance0) +" 1=" + String(distance1)+ " 2=" + String(distance2) + " M=" + String(distanceM)+ "S="+String(scannerAngle);
@@ -241,7 +241,7 @@ void pilotStopScanner(void) {
     addToJournal(message.c_str()); // Add message to journal
     //full stop:
     for(int i=0; i<20; i++) {
-        vTaskDelay(50 / portTICK_PERIOD_MS); // delay 50 мс
+        vTaskDelay(STOP_CHECK_DELAY / portTICK_PERIOD_MS); // Delay to check for a complete stop (in milliseconds)
         int realDistanceCovered = odometer();
         if(realDistanceCovered == currentDistanceCovered) {
             Serial.print("realDistanceCovered = "); Serial.print(realDistanceCovered);

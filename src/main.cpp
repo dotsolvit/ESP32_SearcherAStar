@@ -150,7 +150,7 @@ void webTask(void *pvParameters) {    // функція задачі FreeRTOS (t
 
 
 void setup() {
-  Serial.begin(115200); // ініціалізуємо Serial для відладки (init Serial monitor)
+  Serial.begin(SERIAL_BAUD_RATE); // ініціалізуємо Serial для відладки (init Serial monitor)
   Wire.begin();
 
   //Set interrupt////////////
@@ -166,10 +166,10 @@ void setup() {
   Serial.println("Interrupts are initialized");
   ////////////////////////////
 
-  // створюємо мютекс (create mutex)
+  //Create mutex
   xMutex = xSemaphoreCreateMutex(); 
 
-  // створюємо дві черги на 5 елементів типу byte кожна (create two queues, 5 elements each)
+  // Create two queues, 5 elements each
   toWebQueue = xQueueCreate(5, sizeof(byte));
   toDriveQueue  = xQueueCreate(5, sizeof(byte));
   

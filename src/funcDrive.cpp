@@ -110,31 +110,6 @@ int initializationObstacleSet(){
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) {
         //Clear Obstacle Set:
         ClearCoords(obstacleSet, obstacleSetPar);
-        /*
-        //temporarily place obstacles manually (тимчасово розміщуємо перешкоди вручну)
-        Coord obstacle;
-        obstacle={0,0};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={1,0};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={2,0};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={2,1};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={2,2};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={2,8};   
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={2,9};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-        obstacle={20,16};
-        AddCoords(obstacleSet, obstacleSetPar, obstacle);
-
-        Serial.println(obstacleSet[0].y); // Виводимо координату y першої перешкоди для перевірки (Print y coordinate of the first obstacle for verification)
-        Serial.println(obstacleSet[0].x); // Виводимо координату x
-        //...........
-        */
-       
         xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
     } 
     else {
@@ -444,49 +419,6 @@ void cycleDrive(void){
             }
             vTaskDelay(5 / portTICK_PERIOD_MS); // delay 5 ms
         }
-
-        /*
-        //Test turn -45 fyd +45 degrees:
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        TankRorateOnAngle(-45);
-        currentAngle=getAngleX();
-        displayAngle( currentAngle );
-
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-        TankRorateOnAngle(45);
-        currentAngle=getAngleX();
-        displayAngle( currentAngle );
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
-        */
- 
-        /*
-        //Pilot initialization
-        if(pilotInit() == 0) {
-
-            if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-
-                for(int i=0; i<500; i++) { //Test journal
-                    //The scanner for detect a new obstacle
-                    if(pilotNarrowScanner() == 1) { //If the scanner detects a new obstacle
-                        TankStop();
-                        Serial.println("The scanner detects a new obstacle!");
-                        addToJournal("Stop.Scanner detects a new obstacle!"); // Add message to journal
-                        break; //
-                    }
-                    pilotForward(); //Go forward
-                    if(pilotStop() == 1) { //If the robot has stopped successfully
-                        break;
-                    }
-                    vTaskDelay(5 / portTICK_PERIOD_MS); // затримка 5 мс (poll every 100ms)
-                }
-
-                xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
-            }
-            else {
-                Serial.println("Failed to take mutex in initRealCoords!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
-            }
-        }
-        */
 
         scannerAngle = 0; //Set scanner angle to 0  
         setServo(scannerAngle);
