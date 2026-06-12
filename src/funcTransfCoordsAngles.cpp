@@ -1,5 +1,5 @@
 //funcTransfCoordsAngles.cpp
-//Функції перетворення координат, кутів та ін. (Functions for transforming coordinates, angles, etc.)
+//Functions for transforming coordinates, angles, etc.
 
 #include <Arduino.h>
 #include "config.hpp"       
@@ -16,7 +16,7 @@ extern Par routeSetPar;
 
 int prevDistanceCoveredRoute = 0; // Previous distance covered
 
-//Перетворити реальні координати на координати сітки(Transform real coordinates to grid coordinates)
+//Transform real coordinates to grid coordinates
 Coord TransformRealToGridCoords(realCoord &coord_in ){
   Coord coord_out;
   coord_out.y=int(coord_in.y/STEP_GRID);
@@ -24,7 +24,7 @@ Coord TransformRealToGridCoords(realCoord &coord_in ){
   return coord_out;
 }
 
-//Перетворити координати сітки на реальні координати(Transform grid coordinates to real coordinates) 
+//Transform grid coordinates to real coordinates
 realCoord TransformGridToRealCoords(Coord &coord_in ){
   realCoord coord_out;
   coord_out.y=coord_in.y*STEP_GRID + int( STEP_GRID/2 );
@@ -32,30 +32,30 @@ realCoord TransformGridToRealCoords(Coord &coord_in ){
   return coord_out;
 }
 
-//Розрахунок нових поточних координат(Calculation of new current coordinates)
-realCoord calcRealCoords(realCoord &coord_in, int angle_in, int dictance){
+//Calculation of new current coordinates
+realCoord calcRealCoords(realCoord &coord_in, int angle_in, int distance){
   realCoord coord_out = coord_in;
   float angle_rad = float(angle_in) * M_PI /180;
-  float dY = - sin(angle_rad) * dictance; //в см, минус т.к. у нас угол по часовой стрелке
-  float dX = cos(angle_rad) * dictance; //в см
+  float dY = - sin(angle_rad) * distance; //in cm, minus because our angle is clockwise
+  float dX = cos(angle_rad) * distance; //in cm
   coord_out.y += int(dY);
   coord_out.x += int(dX);
   return coord_out;
 }
 
-//Розрахунок кута на нову точку шляху(Calculation of the angle to the new path point)
+//Calculation of the angle to the new path point
 int calcAngleToNewPointPath(realCoord &coord_in, Coord &new_coord_in){
-  int algle_out;
+  int angle_out;
   realCoord new_coord = TransformGridToRealCoords(new_coord_in);
-  //Визначення різниці координат:
+  //Finding the difference in coordinates:
   float dY=float(new_coord.y - coord_in.y);
   float dX=float(new_coord.x - coord_in.x);
-  //Розрахунок кута (в радіанах):
-  float angleRad = - atan2(dY, dX);//мінус т.к. у нас кут за годинниковою стрілкою(minus because our angle is clockwise)
-  //Перевод в градусы:
+  //Calculation of the angle (in radians):
+  float angleRad = - atan2(dY, dX);//minus because our angle is clockwise
+  //Conversion to degrees and normalization:
   float angleDeg = angleRad * 180 / M_PI;
-  algle_out = normalizeAngle(int(angleDeg));
-  return algle_out;
+  angle_out = normalizeAngle(int(angleDeg));
+  return angle_out;
 }
 
 // normalization of the angles in degrees to the range [0, 360]

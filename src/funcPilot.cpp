@@ -17,12 +17,11 @@ extern Par pathSetPar;
 extern Coord obstacleSet[MAX_OBSTACLE_LENGH];
 extern Par obstacleSetPar;
 //Real Coordinates
-extern realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
-
+extern realCoord realCoordsCurrent, realCoordsGoal; //Current and goal coordinates (in main.cpp)
 //pathIndexForGo
 extern int pathIndexForGo;
 
-extern int currentAngle, displayed_currentAngle; //Текущий угол по Х
+extern int currentAngle, displayed_currentAngle; //Current angle along X (in main.cpp)
 
 //Distance covered:
 extern int currentDistanceCovered; 
@@ -36,8 +35,8 @@ int pilotCurrentSpeed = 0;
 bool circularScannerActive = false; // Sign of a circular scanner in operation
 
 //Jurnal:
-extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
-extern int journalIndex; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
+extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Journal of messages
+extern int journalIndex; //Index for adding messages to the journal
 extern unsigned long journalInitTime;
 
 //Pilot initialization
@@ -257,8 +256,8 @@ void pilotStopScanner(void) {
 
 //Journal:
 void initJournal() {
-    journalIndex = 0; // Сбрасываем индекс (Reset index)
-    journal[journalIndex][0] = '\0'; // Инициализируем первую строку пустой строкой (Initialize the first entry with an empty string) 
+    journalIndex = 0; // Reset index
+    journal[journalIndex][0] = '\0'; // Initialize the first entry with an empty string
     journalInitTime = millis(); // Record the time of journal initialization
 }
 //Function to add a message to the journal
@@ -266,15 +265,15 @@ void addToJournal(const char* message) {
     if (journalIndex < JOURNAL_SIZE) {
         String mes = String(millis()-journalInitTime)+" ";
         mes += message;
-        strncpy(journal[journalIndex], mes.c_str(), JOURNAL_MESSAGE_LENGTH - 1); // Копируем сообщение в журнал (Copy message to journal)
-        journal[journalIndex][JOURNAL_MESSAGE_LENGTH - 1] = '\0'; // Гарантируем нуль-терминирование (Ensure null-termination)
-        journalIndex++; // Увеличиваем индекс для следующей записи (Increment index for next entry)
+        strncpy(journal[journalIndex], mes.c_str(), JOURNAL_MESSAGE_LENGTH - 1); // Copy message to journal
+        journal[journalIndex][JOURNAL_MESSAGE_LENGTH - 1] = '\0'; // Ensure null-termination
+        journalIndex++; // Increment index for next entry
     } else {
-        Serial.println("Journal is full! Cannot add more entries."); // Журнал полон (Journal is full)
+        Serial.println("Journal is full! Cannot add more entries."); // Journal is full
     }
 }
 
-//median filter: from three numbers, the program selects the one that is in the middle in value
+//Median filter: from three numbers, the program selects the one that is in the middle in value
 int medianFilter(int a, int b, int c) {
     if (a <= b && a <= c) {
         return (b <= c) ? b : c;
