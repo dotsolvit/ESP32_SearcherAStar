@@ -1,17 +1,13 @@
 //Functions for motors and servo
-// Add Lib: ESP32Servo by Kevin Harrington 3.2.0
 
 #include <Arduino.h>
 #include <Wire.h>
-//#include <ESP32Servo.h>
 
 #include "config.hpp"
 #include "funcMotors.hpp"
 #include "funcMPU6050.hpp"
 #include "funcTransfCoordsAngles.hpp"
 #include "funcOLED.hpp"
-
-//Servo servoMotor;  // Створюємо об'єкт сервопривода
 
 //Scanner angle:    
 extern int scannerAngle;
@@ -22,20 +18,13 @@ void initializationMotors(void){
     // Old way (v2.x)
     ledcSetup( MOTOR_L_A_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
     ledcAttachPin(MOTOR_L_A_Pin, MOTOR_L_A_Channel);  // (pin, channel)
-    ledcSetup( MOTOR_L_B_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcSetup( MOTOR_L_B_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // 
     ledcAttachPin(MOTOR_L_B_Pin, MOTOR_L_B_Channel);  // (pin, channel)
-    ledcSetup( MOTOR_R_A_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcSetup( MOTOR_R_A_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // 
     ledcAttachPin(MOTOR_R_A_Pin, MOTOR_R_A_Channel);  // (pin, channel)
-    ledcSetup( MOTOR_R_B_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // (channel, frequency, resolution)
+    ledcSetup( MOTOR_R_B_Channel, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION); // 
     ledcAttachPin(MOTOR_R_B_Pin, MOTOR_R_B_Channel);  // (pin, channel)
 
-    //new way (v3.x)
-    //ledcAttach(MOTOR_L_A_Pin, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION);
-    //ledcAttach(MOTOR_L_B_Pin, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION);
-    //ledcAttach(MOTOR_R_A_Pin, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION);
-    //ledcAttach(MOTOR_R_B_Pin, MOTORS_PWM_FREQ, MOTORS_PWM_RESOLUTION);
-
-    // Old way (v2.x)
     ledcWrite(MOTOR_L_A_Channel, 0);
     ledcWrite(MOTOR_L_B_Channel, 0);
     ledcWrite(MOTOR_R_A_Channel, 0);
@@ -45,11 +34,11 @@ void initializationMotors(void){
 //Init Buzzer:
 void initBuzzer() {
     tone(BUZ_PIN, 500);
-    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
+    vTaskDelay(100 / portTICK_PERIOD_MS);       
     noTone(BUZ_PIN);
-    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)
+    vTaskDelay(100 / portTICK_PERIOD_MS);       
     tone(BUZ_PIN, 1000);
-    vTaskDelay(100 / portTICK_PERIOD_MS);       // пауза 100 мс (delay 100 msec, lets other tasks run)  
+    vTaskDelay(100 / portTICK_PERIOD_MS);         
     noTone(BUZ_PIN);
 }
 
