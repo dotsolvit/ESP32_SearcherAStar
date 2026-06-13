@@ -1,3 +1,9 @@
+/*********************************************************************
+ * @brief Searcher AStar on ESP32
+ * @author Dotsenko Oleksandr
+ * @date 2026-06-12
+ * https://github.com/dotsolvit/ESP32_SearcherAStar
+**********************************************************************/
 //Project: ESP32_SearcherAStar
 //main.cpp  
 //
@@ -18,44 +24,43 @@ Par reachableSetPar = {0, 0, MAX_REACHABLE_NODES};
 Node exploredSet[MAX_EXPLORED_NODES]; // This is a list of explored nodes
 Par exploredSetPar = {0, 0, MAX_EXPLORED_NODES};
 
-//Create arrays for shared use in tasks (Створюємо масиви для спільного використання у завданнях)
-//Створюємо шлях (як масив координат та його параметри) 
+//Create arrays for shared use in tasks 
 //Create a path (as an array of coordinates and its parameters)
 volatile Coord pathSet[MAX_PATH_LENGH];
 volatile Par pathSetPar = {0, 0, MAX_PATH_LENGH};
 
-//Створюємо масив перешкоди у вигляді одномірної матриці координат (Create an obstacle array as a one-dimensional matrix of coordinates)
+//Create an obstacle array as a one-dimensional matrix of coordinates
 volatile Coord obstacleSet[MAX_OBSTACLE_LENGH];
 volatile Par obstacleSetPar = {0, 0, MAX_OBSTACLE_LENGH};
 
-//Створюємо масив маршруту (Create a route array)
+//Create a route array
 volatile Coord routeSet[MAX_ROUTE_LENGH];
 volatile Par routeSetPar = {0, 0, MAX_ROUTE_LENGH};
 
 //Real Coordinates
 volatile realCoord realCoordsCurrent, realCoordsGoal; //Текущие и цель
 
-//Стврюємо мютекс для синхронізації доступу до спільних масивів (Create a mutex for synchronizing access to shared matrixes) 
+//Create a mutex for synchronizing access to shared matrixes
 SemaphoreHandle_t xMutex;
 //
 
-QueueHandle_t toWebQueue, toDriveQueue;   // створюємо дві черги: toWeb і toDive (two FreeRTOS queues: toWeb and toDrive)
+QueueHandle_t toWebQueue, toDriveQueue;   //Two FreeRTOS queues: toWeb and toDrive
 
 TaskHandle_t driveTaskHandle = NULL;
 TaskHandle_t webTaskHandle = NULL;
 
-volatile int currentAngle, displayed_currentAngle ; //Текущий угол по Х
+volatile int currentAngle, displayed_currentAngle ; // Current X-angle
 
 //Jurnal:
-char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
-int journalIndex = 0; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
+char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Journal of messages
+int journalIndex = 0; //Index for adding messages to the journal
 unsigned long journalInitTime = 0;
 
 //Distance covered counters:
 volatile int distancePulseCounterLeft = 0;
 volatile int distancePulseCounterRight = 0;
 
-// Функция-обработчик прерывания (ISR)
+// Interrupt handler function (ISR)
 void IRAM_ATTR handlePulseLeft() {
   distancePulseCounterLeft++;
 }
@@ -64,8 +69,8 @@ void IRAM_ATTR handlePulseRight() {
 }
 
 //FreeRTOS tasks Drive:
-void driveTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
-  (void) pvParameters;                  // ігноруємо вхідні параметри
+void driveTask(void *pvParameters) {    
+  (void) pvParameters;                  // Ignores input parameters
   
   //Init EEPROM:
   initEEPROM() ;
@@ -85,7 +90,7 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   
   displayMessage(1, "Waiting 10 seconds..", 0, "");
   initMPU6050(); //Init MPU6050
-  vTaskDelay(10000 / portTICK_PERIOD_MS);       // пауза 10 seconds (delay 10 seconds, lets other tasks run)
+  vTaskDelay(10000 / portTICK_PERIOD_MS);   //Pause for 10 seconds for MPU6050 to stabilize
   displayMessage(1, "OK", 0, "");
 
   //Display distance to obstacles
@@ -95,62 +100,54 @@ void driveTask(void *pvParameters) {    // функція задачі FreeRTOS 
   //Display battery
   displayBattery();
 
-
-
   //Motor initialization
   initializationMotors();
   Serial.println("Motors are initialized");
 
   
-  bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  
-  while (true) {  // безкінечний цикл задачі
+  bool pr_show = true; // Flag for printing of stack remain  
+  while (true) {  // Endless task loop
 
-    cycleDrive(); // виконуємо основну логіку керування (execute main drive logic)
+    cycleDrive(); // Execute main drive logic
 
-
-
-    //vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс для зменшення навантаження (poll every 100ms)
-    
-    if(pr_show) { // перевіряємо скільки залишилось слів в стеку (check of stack remain)
-      Serial.println("uxTaskGetStackHighWaterMark(driveTaskHandle): " + String(uxTaskGetStackHighWaterMark(driveTaskHandle))); // виводимо залишок стека (print stack high water mark)
-       pr_show = false; // вимикаємо прапорець після першого виводу (disable flag after first print)}
+    if(pr_show) { // Check of stack remain
+      Serial.println("uxTaskGetStackHighWaterMark(driveTaskHandle): " + String(uxTaskGetStackHighWaterMark(driveTaskHandle))); // Print stack high water mark
+       pr_show = false; // Disable flag after first print
     }
     
-    if(uxTaskGetStackHighWaterMark(driveTaskHandle) < 500) { // перевіряємо, чи залишилось менше 500 слів стека (check if less than 100 words of stack remain)
-      Serial.println("Warning: driveTask stack is running low!"); // виводимо попередження (print warning)
+    if(uxTaskGetStackHighWaterMark(driveTaskHandle) < 500) { // Check if less than 100 words of stack remain
+      Serial.println("Warning: driveTask stack is running low!"); // Print warning
     } 
   }
 }
 
 //FreeRTOS tasks Web:
-void webTask(void *pvParameters) {    // функція задачі FreeRTOS (task function)
-  (void) pvParameters;                  // ігноруємо вхідні параметри
+void webTask(void *pvParameters) {    
+  (void) pvParameters;                  // Ignores input parameters
   
   setupWiFi(); //Connecting to WiFi in STA mode
 
   Web_starting(); //Starting the web server
   
-  bool pr_show = true; // прапорець для виводу залишку стека (flag for printing stack high water mark)  
-  while (true) {  // безкінечний цикл задачі
+  bool pr_show = true; // Flag for printing of stack remain  
+  while (true) {  //Endless task loop
                          
     handle_Client();  //Processing client requests
 
-    //vTaskDelay(100 / portTICK_PERIOD_MS); // затримка 100 мс для зменшення навантаження (poll every 100ms)
-    
-    if(pr_show) { // перевіряємо скільки залишилось слів в стеку (check of stack remain)
-      Serial.println("uxTaskGetStackHighWaterMark(webTaskHandle): " + String(uxTaskGetStackHighWaterMark(webTaskHandle))); // виводимо залишок стека (print stack high water mark)
-       pr_show = false; // вимикаємо прапорець після першого виводу (disable flag after first print)}
+    if(pr_show) { // Check of stack remain
+      Serial.println("uxTaskGetStackHighWaterMark(webTaskHandle): " + String(uxTaskGetStackHighWaterMark(webTaskHandle))); // Print stack high water mark
+       pr_show = false; // Disable flag after first print
     }
     
-    if(uxTaskGetStackHighWaterMark(webTaskHandle) < 500) { // перевіряємо, чи залишилось менше 500 слів стека (check if less than 100 words of stack remain)
-      Serial.println("Warning: webTask stack is running low!"); // виводимо попередження (print warning)
+    if(uxTaskGetStackHighWaterMark(webTaskHandle) < 500) { // Check if less than 100 words of stack remain
+      Serial.println("Warning: webTask stack is running low!"); // Print warning
     } 
   }
 }
 
 
 void setup() {
-  Serial.begin(SERIAL_BAUD_RATE); // ініціалізуємо Serial для відладки (init Serial monitor)
+  Serial.begin(SERIAL_BAUD_RATE); // Init Serial monitor
   Wire.begin();
 
   //Set interrupt////////////
@@ -174,8 +171,8 @@ void setup() {
   toDriveQueue  = xQueueCreate(5, sizeof(byte));
   
   //Create FreeRTOS tasks
-  //Priority 2 for drive and 1 for web to give more priority to drive task (Пріоритет 2 для drive і 1 для web, щоб надати більший пріоритет задачі drive)
-  //Create a webserver task pinned to core 0 
+  //Priority 2 for drive and 1 for web to give more priority to drive task 
+  //Create a drive task pinned to core 0 
   xTaskCreatePinnedToCore(driveTask, "driveTask", 4096, NULL, 2, &driveTaskHandle, 0);
 
   //Create a webserver task pinned to core 1
@@ -185,6 +182,6 @@ void setup() {
 
 
 void loop() {
-  // Empty because FreeRTOS scheduler runs the tasks (порожній, бо FreeRTOS керує виконанням задач)
+  // Empty because FreeRTOS scheduler runs the tasks 
 }
 
