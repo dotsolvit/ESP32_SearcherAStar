@@ -4,17 +4,17 @@
 #include "config.hpp"   
 #include "funcArray.hpp"
 
-//Для шляху та перешкod (одномірних матриць координат)
+
 //For path and obstacles (one-dimensional coordinate matrices)
 
-//Очистити одновимірну матрицю координат (Clear a one-dimensional coordinate matrix)
+//Clear a one-dimensional coordinate matrix
 void ClearCoords(Coord *set, Par &setp) {
   set[0].x = 0;
   set[0].y = 0;
   setp.setSize = 0;
   setp.setSizeRealMax =0;
 }
-//Додати точку в одновимірну матрицю координат (Add a point to a one-dimensional coordinate matrix)
+//Add a point to a one-dimensional coordinate matrix
 int AddCoords( Coord *set, Par &setp, Coord &c) {
   if(setp.setSize + 1 > setp.setSizeMax) return -1;
   setp.setSize += 1;
@@ -22,10 +22,10 @@ int AddCoords( Coord *set, Par &setp, Coord &c) {
   if(setp.setSize>setp.setSizeRealMax) setp.setSizeRealMax = setp.setSize;
   return 0;
 }
-//Знайти точку з координатами в одновимірній матриці координат (Find a point with coordinates in a one-dimensional coordinate matrix)
+//Find a point with coordinates in a one-dimensional coordinate matrix
 int indexFindPointCoords( Coord *set, Par &setp, Coord &c) {
   if(setp.setSize == 0) return -1;
-  //Поиск в списке
+  //Search the list
   int index =-1;
   for(int i=0; i < setp.setSize; i++){
     //Serial.print(i); Serial.println("(1)");
@@ -36,11 +36,11 @@ int indexFindPointCoords( Coord *set, Par &setp, Coord &c) {
   }
   return index;
 }
-//Видалити точку за індексом в одновимірній матриці координат (Remove a point by index in a one-dimensional coordinate matrix)
+//Remove a point by index in a one-dimensional coordinate matrix
 int RemoveCoords(Coord *set, Par &setp, int index) {
   if(setp.setSize == 0) return -1;
   if(index < 0 or index > setp.setSize -1) return -1;
-  //Сдвиг точек
+  //Shift of points
   for(int i=index+1; i<setp.setSize; i++){
     set[i-1] = set[i];
   }
@@ -49,8 +49,8 @@ int RemoveCoords(Coord *set, Par &setp, int index) {
 }
 
 
-//Операції зі списком вузлів (Operations with the list of nodes)
-//Додати вузол(Add a node)
+//Operations with the list of nodes
+//Add a node
 int AddNode( Node *set, Par &setp, Node &n) {
   if(setp.setSize + 1 > setp.setSizeMax) return -1;
   setp.setSize += 1;
@@ -58,10 +58,10 @@ int AddNode( Node *set, Par &setp, Node &n) {
   if(setp.setSize>setp.setSizeRealMax) setp.setSizeRealMax = setp.setSize;
   return 0;
 }
-//Видалити вузол(Remove a node)
+//Remove a node
 int RemoveNode( Node *set, Par &setp, Node &n) {
   if(setp.setSize == 0) return -1;
-  //Поиск в списке
+  //Search the list
   int index =-1;
   for(int i=0; i < setp.setSize; i++){
     //Serial.print(i); Serial.println("(1)");
@@ -71,7 +71,7 @@ int RemoveNode( Node *set, Par &setp, Node &n) {
     }
   }
   if(index ==-1) return -1;
-  //Зсув списку
+  //Shift
   for(int i=index+1; i<setp.setSize; i++){
     //Serial.print(i); Serial.println("(2)");
     set[i-1] = set[i];
@@ -79,10 +79,10 @@ int RemoveNode( Node *set, Par &setp, Node &n) {
   setp.setSize -=1;
   return 0;
 }
-//Знайти вузол з координатами(Find a node with coordinates)
+//Find a node with coordinates
 int indexFindNode( Node *set, Par &setp, Coord &c) {
   if(setp.setSize == 0) return -1;
-  //Пошук в списку (Search in the list)
+  //Search in the list
   int index =-1;
   for(int i=0; i < setp.setSize; i++){
     //Serial.print(i); Serial.println("(1)");
@@ -93,7 +93,7 @@ int indexFindNode( Node *set, Par &setp, Coord &c) {
   }
   return index;
 }
-//Очистити список вузлів(Clear the list of nodes)
+//Clear the list of nodes
 void ClearNodes( Node *set, Par &setp ) {
   set[0].coord.x = 0;
   set[0].coord.y = 0;
