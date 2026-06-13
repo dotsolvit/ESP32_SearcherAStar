@@ -1,6 +1,6 @@
 //Function OLED
-//OLED дисплей 0.96" I2C 128x64 (желто-синий)
-//Драйвер OLED модуля: SSD1306
+//OLED display 0.96" I2C 128x64 (yellow-blue)
+//OLED module driver: SSD1306
 //Lib:  use two Adafruit libraries: Adafruit_SSD1306 library and Adafruit_GFX library.
 //Adafruit_SSD1306 by Adafruit 2.5.16
 //Adafruit_GFX library by Adafruit 1.12.6
@@ -39,7 +39,7 @@ void initDisplay(void){
 
 //Display distance to obstacles
 void displayDistance(void){
-  static int prev_distance = -1; // Змінна для збереження останнього відображенного расстояния (Variable to store the last displayed distance)
+  static int prev_distance = -1; // Variable to store the last displayed distance
   //int distance = distanceEcho();
   int distance = IR_Distance();
   if (distance != prev_distance) {
@@ -55,7 +55,7 @@ void displayDistance(void){
 
 //Display angle
 void displayAngle(int angle){
-    static int prev_angle = -399; // Змінна для збереження останнього відображеного кута (Variable to store the last displayed angle)
+    static int prev_angle = -399; // Variable to store the last displayed angle
     //Display only if angle has changed (to reduce flickering and unnecessary updates)
     if (angle != prev_angle) {
         prev_angle = angle; // Update the last displayed angle
@@ -69,11 +69,11 @@ void displayAngle(int angle){
 
 //Display battery
 void displayBattery(void){
-    static int prev_percentage = -1; // Змінна для збереження останнього відображеного відсотка заряду (Variable to store the last displayed battery percentage)
-    static unsigned long timeLastMeasurement = 0; // Змінна для збереження часу останнього вимірювання (Variable to store the time of the last measurement)
+    static int prev_percentage = -1; // Variable to store the last displayed battery percentage
+    static unsigned long timeLastMeasurement = 0; // Variable to store the time of the last measurement
     static float filteredValue = 0.0;
     if (millis() - timeLastMeasurement < BATTERY_MONITORING_PERIOD) {
-        return; // Повертаємося, якщо ще не минуло достатньо часу для наступного вимірювання (Return if it's not time for the next measurement yet)
+        return; // Return if it's not time for the next measurement yet
     }
     timeLastMeasurement = millis();
   
