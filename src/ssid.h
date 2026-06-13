@@ -1,5 +1,5 @@
 //ssid.h
-//WiFi settings:
+//Налаштування WiFi (WiFi settings)
 
-#define WIFI_SSID "******"
-#define WIFI_PASS "********"
+#define WIFI_SSID "HOME2"
+#define WIFI_PASS "dotsenko2021"

@@ -1,5 +1,5 @@
 //funcWiFiWeb.hpp
-//Модуль фунукццій для роботи з WiFi та веб-сервером на ESP32
+//Function module for robots with WiFi and web server on ESP32
 
 //Connecting to WiFi in STA mode
 void setupWiFi(void);
@@ -50,10 +50,8 @@ void handle_seemapdown(void);
 //Function for generating an HTML page Table
 String SendSeeMapHTML(String mess);
 
-//Формування рядка web_messageMap як карти перешкод та шляху
 //Forming the web_messageMap string as a map of obstacles and path
 String mapObstacleAndPath(int top_line_number);
 
-//Знайти точку з координатами в одновимірній матриці координат
 //Find a point with coordinates in a one-dimensional matrix of coordinates
 int indexFindPointCoords( Coord *set, uint8_t setSize, Coord &c);

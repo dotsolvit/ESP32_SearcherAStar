@@ -1,5 +1,5 @@
 //funcWiFiWeb.cpp
-//Модуль фунукццій для роботи з WiFi та веб-сервером на ESP32
+//Function module for robots with WiFi and web server on ESP32
 //
 
 #include <Arduino.h>
@@ -36,10 +36,10 @@ extern SemaphoreHandle_t xMutex;
 extern QueueHandle_t toWebQueue, toDriveQueue;   // two FreeRTOS queues: toWeb and toDrive (in main.cpp)
 
 //Jurnal:
-extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Журнал сообщений (Journal of messages)
-extern int journalIndex; //Индекс для добавления сообщений в журнал (Index for adding messages to the journal)
+extern char journal[JOURNAL_SIZE][JOURNAL_MESSAGE_LENGTH]; //Journal of messages
+extern int journalIndex; //Index for adding messages to the journal
 
-WebServer server(80);  // Вебсервер на порту 80 (Web server on port 80)
+WebServer server(80);  // Web server on port 80
 
 //web message
 String web_message, web_messageMap;
@@ -81,7 +81,7 @@ void setupWiFi(void) {
 }
 
 //Web
-// Основна логіка керування Web (main Web logic)
+//main Web logic
 //Starting the web server
 void Web_starting(){
   //initialization parameters:
@@ -89,17 +89,17 @@ void Web_starting(){
   web_messageMap="Test";
 
   //Loading current and goal coords for the main page:
-  if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
+  if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Lock mutex for safe access to shared variables
     //Current coords
     current_y = realCoordsCurrent.y; 
     current_x = realCoordsCurrent.x;
     //Goal coords
     goal_y = realCoordsGoal.y;
     goal_x = realCoordsGoal.x;
-    xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+    xSemaphoreGive(xMutex); // Release mutex after done
   } 
   else {
-    Serial.println("Failed to take mutex in Web_starting!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+    Serial.println("Failed to take mutex in Web_starting!"); // Print error message if failed to take mutex
   }  
 
   //Configuring routes for the web server
@@ -133,32 +133,32 @@ void handle_OnConnect() {
 void handle_sendyx(void) {
   if( server.hasArg("Y") ) {
     String valY = server.arg("Y");
-    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-      realCoordsGoal.y = valY.toInt(); // Преобразование в число
+    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Lock mutex for safe access to shared variables
+      realCoordsGoal.y = valY.toInt(); 
       Serial.println("Y"+valY); //Send Y coords to Serial
       current_y = realCoordsCurrent.y; 
       current_x = realCoordsCurrent.x;
       goal_y = realCoordsGoal.y;
       goal_x = realCoordsGoal.x;
-      xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+      xSemaphoreGive(xMutex); // Release mutex after done
     } 
     else {
-      Serial.println("Failed to take mutex in handle_sendyx!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+      Serial.println("Failed to take mutex in handle_sendyx!"); // Print error message if failed to take mutex
     }  
   }
   if( server.hasArg("X") ) {
     String valX = server.arg("X");
-    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Блокування м'ютекса для безпечного доступу до спільних змінних (Lock mutex for safe access to shared variables)
-      realCoordsGoal.x = valX.toInt(); // Преобразование в число
+    if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Lock mutex for safe access to shared variables
+      realCoordsGoal.x = valX.toInt(); 
       Serial.println("X"+valX); //Send X coords to Serial
       current_y = realCoordsCurrent.y; 
       current_x = realCoordsCurrent.x;
       goal_y = realCoordsGoal.y;
       goal_x = realCoordsGoal.x;
-      xSemaphoreGive(xMutex); // Звільнення м'ютекса після завершення роботи (Release mutex after done)
+      xSemaphoreGive(xMutex); // Release mutex after done
     }
     else {
-      Serial.println("Failed to take mutex in handle_sendyx!"); // Виводимо повідомлення про помилку, якщо не вдалося взяти м'ютекс (Print error message if failed to take mutex)
+      Serial.println("Failed to take mutex in handle_sendyx!"); // Print error message if failed to take mutex
     }
   }
   server.sendHeader("Location", "/"); //Redirect to the main page
@@ -365,11 +365,9 @@ String SendSeeMapHTML(String mess) {
     </body>
     </html>
   )";
-  return html; //Повернення готової HTML-сторінки (Returning the finished HTML page)
+  return html; //Returning the finished HTML page
 }
 
-
-//Формування рядка web_messageMap як карти перешкод та шляху
 //Forming the web_messageMap string as a map of obstacles and path
 String mapObstacleAndPath(int top_line_number){
   String web_m="";
@@ -416,7 +414,6 @@ String mapObstacleAndPath(int top_line_number){
   return web_m;
 }  
 
-//Знайти точку з координатами в одновимірній матриці координат
 //Find a point with coordinates in a one-dimensional matrix of coordinates
 int indexFindPointCoords( Coord *set, uint8_t setSize, Coord &c) {
   if(setSize == 0) return -1;
