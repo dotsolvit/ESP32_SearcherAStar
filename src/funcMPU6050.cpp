@@ -8,7 +8,7 @@
 
 #include "funcMPU6050.hpp" //Functions MPU6050
 
-//Наявність модуля MPU6050
+//Availability of the MPU6050 module
 bool isMPU6050Present;
 
 //For MPU6050 DMP6:
