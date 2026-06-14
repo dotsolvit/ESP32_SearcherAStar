@@ -16,7 +16,7 @@ This is an educational project that implements autonomous control of a model car
 - **Dynamic replanning:** New obstacles are added to the obstacle map and A* recalculates the route; motion resumes if a route exists.
 - **Termination:** Movement ends upon reaching the goal or when no feasible route can be built.
 
-##Model Control
+## Model Control
 To control the model, the microcontroller is connected to a WiFi network and a web server provides an appropriate interface that allows you to: set the coordinates of the target point, start movement, view the obstacle map and movement route, and obtain information on movement diagnostics and resource usage.
 
 Example of an obstacle map and route: ![Example](/images/ExampleOfAnObstacleMapAndRoute.jpg)
