@@ -91,8 +91,8 @@ void initEEPROM() {
 //Init Real Coordinates:
     void initRealCoords() {
     if (xSemaphoreTake(xMutex, portMAX_DELAY) == pdTRUE) { // Lock mutex for safe access to shared variables
-      realCoordsCurrent={155, 125}; //Current   175, 125
-      realCoordsGoal={155, 295};   //Goal 155, 295 
+      realCoordsCurrent={175, 135}; //Current   175, 135
+      realCoordsGoal={265, 305};   //Goal 265, 305 
       xSemaphoreGive(xMutex); // Release mutex after done
     } 
     else {
