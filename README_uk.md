@@ -60,3 +60,10 @@ platformio run -t upload
 Бажаю успіхів!
 
 P.S. Проєкт розроблявся як курсова робота під час навчання на курсах ESP32, Ground Drone, Unmanned Ground Vehicle та GITHUB у Nanit Академії: https://www.linkedin.com/company/nanitrobot/
+
+У публікаціях на LinkedIn розміщено два короткі відеоролики, що демонструють роботу цього проекту:
+
+https://www.linkedin.com/feed/update/urn:li:activity:7471921231014068224/
+
+https://www.linkedin.com/feed/update/urn:li:activity:7472582563685998592/
+
