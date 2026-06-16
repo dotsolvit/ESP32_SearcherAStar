@@ -64,3 +64,10 @@ This project demonstrates ESP32 programming, peripheral control, creating an emb
 Good luck and enjoy experimenting!
 
 P.S. The project was developed as a coursework while studying ESP32, Ground Drone, Unmanned Ground Vehicle and GITHUB courses at Nanit Academy: https://www.linkedin.com/company/nanitrobot/
+
+Two short videos demonstrating how this project works are featured in LinkedIn posts:
+
+https://www.linkedin.com/feed/update/urn:li:activity:7471921231014068224/
+
+https://www.linkedin.com/feed/update/urn:li:activity:7472582563685998592/
+
